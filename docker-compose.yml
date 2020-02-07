@@ -5,6 +5,8 @@ services:
     build:
       context: .
       dockerfile: docker/api/Dockerfile
+    depends_on:
+      - db
     ports:
         - 8081:8080
     volumes:
@@ -19,6 +21,8 @@ services:
     build:
       context: .
       dockerfile: ./docker/front/Dockerfile
+    depends_on:
+      - db
     ports:
       - 8080:8080
     volumes:
@@ -27,3 +31,17 @@ services:
     stdin_open: true
     tty: true
     command: npm run serve
+  db:
+    build: docker/mysql
+    ports:
+      - 3306:3306
+    volumes:
+      - ./docker/mysql/data:/var/lib/mysql
+      - ./docker/mysql/conf.d:/etc/mysql/conf.d
+      - ./log/mysql:/var/log/mysql
+    environment:
+      MYSQL_DATABASE: mysql
+      MYSQL_USER: user
+      MYSQL_PASSWORD: pass
+      MYSQL_ROOT_PASSWORD: root
+      TZ: Asia/Tokyo
