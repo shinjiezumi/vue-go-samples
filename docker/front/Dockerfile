@@ -2,6 +2,9 @@ FROM node:12.12.0-alpine
 
 WORKDIR /app
 
-COPY ./src/front/package*.json ./
+RUN apk update && \
+    npm install -g npm @vue/cli
 
-RUN npm install
+#COPY ./src/front/package*.json ./
+
+#RUN npm install
