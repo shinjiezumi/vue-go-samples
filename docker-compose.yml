@@ -10,7 +10,7 @@ services:
     ports:
         - 8081:8080
     volumes:
-        - ./src/api:/go/src/github.com/shinjiezumi/go-todo-api
+        - ./src/api:/go/src/github.com/shinjiezumi/vue-go-samples/src/api
 #        - /go/src/github.com/shinjiezumi/go-todo-api/vendor
     environment:
       TZ: Asia/Tokyo
@@ -40,8 +40,6 @@ services:
       - ./docker/mysql/conf.d:/etc/mysql/conf.d
       - ./log/mysql:/var/log/mysql
     environment:
-      MYSQL_DATABASE: mysql
-      MYSQL_USER: user
-      MYSQL_PASSWORD: pass
+      MYSQL_DATABASE: sample
       MYSQL_ROOT_PASSWORD: root
       TZ: Asia/Tokyo
