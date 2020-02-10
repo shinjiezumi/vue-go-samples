@@ -3,14 +3,15 @@ package auth
 import (
 	"github.com/appleboy/gin-jwt"
 	"github.com/gin-gonic/gin"
+	"github.com/gin-gonic/gin/binding"
 	"github.com/shinjiezumi/vue-go-samples/src/api/models"
 	"log"
 	"net/http"
+	"os"
 	"time"
 )
 
-// TODO 秘匿化
-var secretKey = "75c92a074c341e9964329c0550c2673730ed8479c885c43122c90a2843177d5ef21cb50cfadcccb20aeb730487c11e09ee4dbbb02387242ef264e74cbee97213"
+var secretKey = os.Getenv("JWT_SECRET_KEY")
 
 type login struct {
 	Email    string `form:"email" json:"email" binding:"required"`
@@ -25,19 +26,19 @@ type registerParams struct {
 var IdentityKey = "id"
 
 func Register(c *gin.Context) {
-	var registerParams registerParams
-	if err := c.ShouldBind(&registerParams); err != nil {
+	var params registerParams
+	if err := c.ShouldBindBodyWith(&params, binding.JSON); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "email and password is required",
+			"message": "email and password is required",
 		})
 		return
 	}
 
 	// TODO バリデーション
 
-	if err := models.StoreUser(registerParams.Name, registerParams.Email, registerParams.Password); err != nil {
+	if err := models.StoreUser(params.Name, params.Email, params.Password); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"error": "registration failure",
+			"message": "Registration failure",
 		})
 		return
 	}
@@ -53,6 +54,18 @@ func Login(c *gin.Context) {
 	}
 
 	authMiddleware.LoginHandler(c)
+}
+
+func CurrentUser(c *gin.Context) {
+	authMiddleware, err := createAuthMiddleware()
+	if err != nil {
+		log.Fatal("JWT Error:" + err.Error())
+	}
+
+	user := authMiddleware.IdentityHandler(c).(*models.User)
+	c.JSON(http.StatusOK, gin.H{
+		"name": user.Name,
+	})
 }
 
 func RefreshToken(c *gin.Context) {
@@ -97,7 +110,7 @@ func createAuthMiddleware() (*jwt.GinJWTMiddleware, error) {
 		},
 		Authenticator: func(c *gin.Context) (interface{}, error) {
 			var loginParams login
-			if err := c.ShouldBind(&loginParams); err != nil {
+			if err := c.ShouldBindBodyWith(&loginParams, binding.JSON); err != nil {
 				return "", jwt.ErrMissingLoginValues
 			}
 
@@ -110,13 +123,6 @@ func createAuthMiddleware() (*jwt.GinJWTMiddleware, error) {
 			}
 
 			return nil, jwt.ErrFailedAuthentication
-		},
-		Authorizator: func(data interface{}, c *gin.Context) bool {
-			if v, ok := data.(*models.User); ok && v.Name == "admin" {
-				return true
-			}
-
-			return false
 		},
 		Unauthorized: func(c *gin.Context, code int, message string) {
 			c.JSON(code, gin.H{

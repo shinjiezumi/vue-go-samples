@@ -2,6 +2,11 @@
   <v-content>
     <v-container>
       <v-row class="text-center" align="center" justify="center">
+        <v-col cols="8">
+          <v-alert v-if="this.getError !== ''" type="error" text>{{this.getError}}</v-alert>
+        </v-col>
+      </v-row>
+      <v-row class="text-center" align="center" justify="center">
         <v-col class="mb-4" cols="12" sm="8" md="4">
           <v-toolbar color="primary" dark>
             <v-toolbar-title>会員登録</v-toolbar-title>
@@ -11,12 +16,12 @@
               <v-col>
                 <v-text-field
                     type="text"
-                    v-model="username"
+                    v-model="name"
                     label="ユーザー名"
-                    :error-messages="usernameErrors"
+                    :error-messages="nameErrors"
                     required
-                    @input="$v.username.$touch()"
-                    @blur="$v.username.$touch()"
+                    @input="$v.name.$touch()"
+                    @blur="$v.name.$touch()"
                 />
               </v-col>
               <v-col>
@@ -42,7 +47,7 @@
                 />
               </v-col>
               <v-col>
-                <v-btn color="primary" @click="login">会員登録</v-btn>
+                <v-btn color="primary" @click="register">会員登録</v-btn>
               </v-col>
             </v-form>
           </v-card>
@@ -55,27 +60,31 @@
 <script>
   import { validationMixin } from 'vuelidate'
   import { email, minLength, required } from 'vuelidate/lib/validators'
+  import { mapGetters } from "vuex";
 
   export default {
     name: "Login",
     mixins: [validationMixin],
+    created() {
+      this.$store.dispatch("error/clearError")
+    },
     validations: {
-      username: {required},
+      name: {required},
       email: {required, email},
       password: {required, minLength: minLength(8)},
     },
     data() {
       return {
-        username: '',
+        name: '',
         email: '',
         password: '',
       }
     },
     computed: {
-      usernameErrors() {
+      nameErrors() {
         const errors = [];
-        if (!this.$v.username.$dirty) return errors;
-        !this.$v.username.required && errors.push('ユーザー名を入力してください');
+        if (!this.$v.name.$dirty) return errors;
+        !this.$v.name.required && errors.push('ユーザー名を入力してください');
         return errors;
       },
       emailErrors() {
@@ -91,14 +100,29 @@
         !this.$v.password.required && errors.push('パスワードを入力してください');
         !this.$v.password.minLength && errors.push('パスワードは8文字以上で入力してください');
         return errors;
-      }
+      },
+      ...mapGetters("error", ["getError"])
     },
     methods: {
-      login() {
+      async register() {
         this.$v.$touch();
         if (this.$v.$invalid) return;
 
-        alert("sending")
+        await this.$store.dispatch("auth/register", {
+          "name": this.name,
+          "email": this.email,
+          "password": this.password
+        });
+
+        if (this.getError === '') {
+          const getUser = async () => {
+            await this.$store.dispatch("auth/currentUser");
+          };
+
+          getUser();
+
+          this.$router.push('/')
+        }
       }
     }
   }
