@@ -2,12 +2,12 @@
 
 
 [[projects]]
-  branch = "master"
-  digest = "1:6726437ac0e60c0904e7eba21dfcc7c47f260e194027820229d0c98e328e1269"
-  name = "github.com/auth0/go-jwt-middleware"
+  digest = "1:be5f2cec0df4bae4676125265a9862e1ce9870443b63137ffd9fee0b643014dd"
+  name = "github.com/appleboy/gin-jwt"
   packages = ["."]
   pruneopts = "UT"
-  revision = "36081240882bbf356af6efb152969e4b0bcf4456"
+  revision = "7e3a047b5d5348efc589244289f73ecef6c87e84"
+  version = "v2.6.3"
 
 [[projects]]
   digest = "1:76dc72490af7174349349838f2fe118996381b31ea83243812a97e5a0fd5ed55"
@@ -165,7 +165,7 @@
   analyzer-name = "dep"
   analyzer-version = 1
   input-imports = [
-    "github.com/auth0/go-jwt-middleware",
+    "github.com/appleboy/gin-jwt",
     "github.com/dgrijalva/jwt-go",
     "github.com/gin-gonic/gin",
     "github.com/go-sql-driver/mysql",

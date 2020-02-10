@@ -42,9 +42,5 @@
   version = "1.5.0"
 
 [[constraint]]
-  name = "github.com/dgrijalva/jwt-go"
-  version = "3.2.0"
-
-[[constraint]]
-  branch = "master"
-  name = "github.com/auth0/go-jwt-middleware"
+  name = "github.com/appleboy/gin-jwt"
+  version = "2.6.3"
