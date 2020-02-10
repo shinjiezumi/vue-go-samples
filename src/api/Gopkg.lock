@@ -2,6 +2,30 @@
 
 
 [[projects]]
+  digest = "1:be5f2cec0df4bae4676125265a9862e1ce9870443b63137ffd9fee0b643014dd"
+  name = "github.com/appleboy/gin-jwt"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "7e3a047b5d5348efc589244289f73ecef6c87e84"
+  version = "v2.6.3"
+
+[[projects]]
+  digest = "1:76dc72490af7174349349838f2fe118996381b31ea83243812a97e5a0fd5ed55"
+  name = "github.com/dgrijalva/jwt-go"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "06ea1031745cb8b3dab3f6a236daf2b0aa468b7e"
+  version = "v3.2.0"
+
+[[projects]]
+  digest = "1:cc93dd54278f6c0dd4b43588b3cf2c07b09b2a6dd4e2617edf81aa8946054c1e"
+  name = "github.com/gin-contrib/cors"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "5f50d4fb4e0306dcacc6f8e9bea2dcee784dbbdf"
+  version = "v1.3.0"
+
+[[projects]]
   digest = "1:3ee1d175a75b911a659fbd860060874c4f503e793c5870d13e5a0ede529a63cf"
   name = "github.com/gin-contrib/sse"
   packages = ["."]
@@ -42,12 +66,36 @@
   version = "v0.17.0"
 
 [[projects]]
+  digest = "1:a3af33fd30536d9c5a7b6ad542390919e57c1125097a194c7b3d9904109a0611"
+  name = "github.com/go-sql-driver/mysql"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "17ef3dd9d98b69acec3e85878995ada9533a9370"
+  version = "v1.5.0"
+
+[[projects]]
   digest = "1:318f1c959a8a740366fce4b1e1eb2fd914036b4af58fbd0a003349b305f118ad"
   name = "github.com/golang/protobuf"
   packages = ["proto"]
   pruneopts = "UT"
   revision = "c823c79ea1570fb5ff454033735a8e68575d1d0f"
   version = "v1.3.0"
+
+[[projects]]
+  digest = "1:1474777fcd22636dda699562076f083bfc22ca2d2121bdfd3bf21a1ef0239fe7"
+  name = "github.com/jinzhu/gorm"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "79a77d771dee4e4b60e9c543e8663bbc80466670"
+  version = "v1.9.12"
+
+[[projects]]
+  digest = "1:01ed62f8f4f574d8aff1d88caee113700a2b44c42351943fa73cc1808f736a50"
+  name = "github.com/jinzhu/inflection"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "f5c5f50e6090ae76a29240b61ae2a90dd810112e"
+  version = "v1.0.0"
 
 [[projects]]
   digest = "1:f5a2051c55d05548d2d4fd23d244027b59fbd943217df8aa3b5e170ac2fd6e1b"
@@ -99,6 +147,17 @@
 
 [[projects]]
   branch = "master"
+  digest = "1:9d5b5d543996dd584da1db1e0de1926f3e4c3a8dba0fa2f8db70f3ebee2342e0"
+  name = "golang.org/x/crypto"
+  packages = [
+    "bcrypt",
+    "blowfish",
+  ]
+  pruneopts = "UT"
+  revision = "ecb85df213405b7d32e4d73cb5bbaace2ec88881"
+
+[[projects]]
+  branch = "master"
   digest = "1:fea09edda033799f8e99ab9042bda910bf1e3bf088c03eaf2ba8aba3adbbc8bf"
   name = "golang.org/x/sys"
   packages = ["unix"]
@@ -124,6 +183,13 @@
 [solve-meta]
   analyzer-name = "dep"
   analyzer-version = 1
-  input-imports = ["github.com/gin-gonic/gin"]
+  input-imports = [
+    "github.com/appleboy/gin-jwt",
+    "github.com/gin-contrib/cors",
+    "github.com/gin-gonic/gin",
+    "github.com/go-sql-driver/mysql",
+    "github.com/jinzhu/gorm",
+    "golang.org/x/crypto/bcrypt",
+  ]
   solver-name = "gps-cdcl"
   solver-version = 1

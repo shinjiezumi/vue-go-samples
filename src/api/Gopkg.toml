@@ -32,3 +32,23 @@
 [prune]
   go-tests = true
   unused-packages = true
+
+[[constraint]]
+  name = "github.com/jinzhu/gorm"
+  version = "1.9.12"
+
+[[constraint]]
+  name = "github.com/go-sql-driver/mysql"
+  version = "1.5.0"
+
+[[constraint]]
+  name = "github.com/appleboy/gin-jwt"
+  version = "2.6.3"
+
+[[constraint]]
+  name = "github.com/gin-contrib/cors"
+  version = "1.3.0"
+
+[[constraint]]
+  branch = "master"
+  name = "golang.org/x/crypto"
