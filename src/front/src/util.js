@@ -8,3 +8,14 @@ export const setToken = (token) => {
   localStorage.setItem("token", token)
 };
 
+export const formatDate = (date) => {
+  if (!date) return null;
+
+  return date.replace(/-/g, '/');
+};
+
+export const parseDate = (date) => {
+  if (!date) return null;
+
+  return date.replace(/\//g, '-');
+};

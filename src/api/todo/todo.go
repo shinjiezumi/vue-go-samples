@@ -1,18 +1,96 @@
 package todo
 
 import (
-	jwt "github.com/appleboy/gin-jwt"
 	"github.com/gin-gonic/gin"
+	"github.com/gin-gonic/gin/binding"
 	"github.com/shinjiezumi/vue-go-samples/src/api/auth"
 	"github.com/shinjiezumi/vue-go-samples/src/api/models"
+	"net/http"
+	"strconv"
 )
 
-func Todos(c *gin.Context) {
-	claims := jwt.ExtractClaims(c)
-	user, _ := c.Get(auth.IdentityKey)
+type todoParams struct {
+	Title      string  `form:"title" json:"title"`
+	Memo       string  `form:"memo" json:"memo"`
+	LimitDate  string  `form:"limit_date" json:"limit_date"`
+	FinishedAt *string `form:"finished_at" json:"finished_at"`
+}
+
+func GetList(c *gin.Context) {
+	user := auth.GetLoginUser(c)
+	todoList := models.FindTodos(user.Id)
+
+	c.JSON(http.StatusOK, gin.H{
+		"data": todoList,
+	})
+}
+
+func StoreTodo(c *gin.Context) {
+	var params todoParams
+	if err := c.ShouldBindBodyWith(&params, binding.JSON); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": "title and limit_date is required",
+		})
+		return
+	}
+
+	// TODO バリデーション＋CSRF
+
+	user := auth.GetLoginUser(c)
+
+	err := models.StoreTodo(user.Id, params.Title, params.Memo, params.LimitDate)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "エラーが発生しました",
+		})
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"message": "保存しました",
+	})
+}
+
+func ModifyTodo(c *gin.Context) {
+	var params todoParams
+	if err := c.ShouldBindBodyWith(&params, binding.JSON); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{
+			"message": "title and limit_date is required",
+		})
+		return
+	}
+	id, _ := strconv.ParseUint(c.Param("id"), 10, 64)
+
+	// TODO バリデーション＋CSRF
+
+	user := auth.GetLoginUser(c)
+
+	err := models.UpdateTodo(id, user.Id, params.Title, params.Memo, params.LimitDate, params.FinishedAt)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "エラーが発生しました",
+		})
+	}
+
 	c.JSON(200, gin.H{
-		"userID":   claims[auth.IdentityKey],
-		"userName": user.(*models.User).Name,
-		"text":     "Hello World.",
+		"message": "更新しました",
+	})
+}
+
+func RemoveTodo(c *gin.Context) {
+	id, _ := strconv.ParseUint(c.Param("id"), 10, 64)
+
+	user := auth.GetLoginUser(c)
+
+	// TODO CSRF
+
+	err := models.DeleteTodo(id, user.Id)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"message": "エラーが発生しました",
+		})
+	}
+
+	c.JSON(200, gin.H{
+		"message": "削除しました",
 	})
 }

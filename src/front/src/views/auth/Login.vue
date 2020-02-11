@@ -39,7 +39,7 @@
                 <v-btn color="primary" @click="login">ログイン</v-btn>
               </v-col>
               <v-col>
-                <v-btn color="primary" @click="testLogin">テストログイン</v-btn>
+                <v-btn color="primary" @click="testLogin">テストユーザーでログイン</v-btn>
               </v-col>
             </v-form>
           </v-card>

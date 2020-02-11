@@ -23,7 +23,7 @@ type registerParams struct {
 	login
 }
 
-var IdentityKey = "id"
+var IdentityKey = "name"
 
 func Register(c *gin.Context) {
 	var params registerParams
@@ -34,7 +34,7 @@ func Register(c *gin.Context) {
 		return
 	}
 
-	// TODO バリデーション
+	// TODO バリデーション＋CSRF
 
 	if err := models.StoreUser(params.Name, params.Email, params.Password); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -57,12 +57,7 @@ func Login(c *gin.Context) {
 }
 
 func CurrentUser(c *gin.Context) {
-	authMiddleware, err := createAuthMiddleware()
-	if err != nil {
-		log.Fatal("JWT Error:" + err.Error())
-	}
-
-	user := authMiddleware.IdentityHandler(c).(*models.User)
+	user := GetLoginUser(c)
 	c.JSON(http.StatusOK, gin.H{
 		"name": user.Name,
 	})
@@ -86,6 +81,15 @@ func MiddlewareFunc() gin.HandlerFunc {
 	return authMiddleware.MiddlewareFunc()
 }
 
+func GetLoginUser(c *gin.Context) *models.User {
+	authMiddleware, err := createAuthMiddleware()
+	if err != nil {
+		log.Fatal("JWT Error:" + err.Error())
+	}
+
+	return authMiddleware.IdentityHandler(c).(*models.User)
+}
+
 func createAuthMiddleware() (*jwt.GinJWTMiddleware, error) {
 	// the jwt middleware
 	authMiddleware, err := jwt.New(&jwt.GinJWTMiddleware{
@@ -97,6 +101,7 @@ func createAuthMiddleware() (*jwt.GinJWTMiddleware, error) {
 		PayloadFunc: func(data interface{}) jwt.MapClaims {
 			if v, ok := data.(*models.User); ok {
 				return jwt.MapClaims{
+					"id":        v.Id,
 					IdentityKey: v.Name,
 				}
 			}
@@ -104,7 +109,9 @@ func createAuthMiddleware() (*jwt.GinJWTMiddleware, error) {
 		},
 		IdentityHandler: func(c *gin.Context) interface{} {
 			claims := jwt.ExtractClaims(c)
+			id := claims["id"].(float64)
 			return &models.User{
+				Id:   uint64(id),
 				Name: claims[IdentityKey].(string),
 			}
 		},
