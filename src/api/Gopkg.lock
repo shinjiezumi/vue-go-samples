@@ -187,6 +187,7 @@
     "github.com/appleboy/gin-jwt",
     "github.com/gin-contrib/cors",
     "github.com/gin-gonic/gin",
+    "github.com/gin-gonic/gin/binding",
     "github.com/go-sql-driver/mysql",
     "github.com/jinzhu/gorm",
     "golang.org/x/crypto/bcrypt",

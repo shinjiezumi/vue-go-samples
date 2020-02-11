@@ -2,7 +2,7 @@
   <v-content>
     <v-row class="text-center" align="center" justify="center">
       <v-col class="mb-4" cols="12" sm="8">
-        <div text>ホーム</div>
+        <div>Todo</div>
       </v-col>
     </v-row>
   </v-content>
@@ -10,7 +10,7 @@
 
 <script>
   export default {
-    name: "Home"
+    name: "Todo"
   }
 </script>
 
