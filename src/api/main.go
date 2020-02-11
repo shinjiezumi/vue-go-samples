@@ -33,7 +33,15 @@ func main() {
 		api.Use(auth.MiddlewareFunc())
 		{
 			api.GET("/user", auth.CurrentUser)
-			api.GET("/todos", todo.Todos)
+
+			//todoRoute := router.Group("/todo")
+			//{
+			//}
+			api.POST("/todo", todo.StoreTodo)
+			api.GET("/todo/list", todo.GetList)
+			api.PUT("/todo/:id", todo.ModifyTodo)
+			api.DELETE("/todo/:id", todo.RemoveTodo)
+
 		}
 	}
 

@@ -10,3 +10,15 @@ create table users
     constraint users_email_unique unique (email)
 ) collate = utf8mb4_unicode_ci comment='ユーザー';
 
+create table todos
+(
+    id          bigint unsigned auto_increment primary key comment 'TodoId',
+    user_id     bigint unsigned comment 'ユーザーID',
+    title       varchar(128) not null comment 'タイトル',
+    memo        varchar(255) null comment 'メモ',
+    limit_date  date not null comment '期日',
+    finished_at timestamp null comment '完了日',
+    created_at  timestamp not null comment '作成日時',
+    updated_at  timestamp not null comment '更新日時',
+    index       todos_user_id_index (user_id)
+) collate = utf8mb4_unicode_ci comment='Todoリスト';

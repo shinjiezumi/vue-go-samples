@@ -1,8 +1,8 @@
 <template>
   <v-content>
-    <v-row class="text-center" align="center" justify="center">
+    <v-row class="text-center mt-5" align="center" justify="center">
       <v-col class="mb-4" cols="12" sm="8">
-        <div text>トップ</div>
+        <v-btn to="/todo" text>Todoリスト</v-btn>
       </v-col>
     </v-row>
     <v-row class="text-center" align="center" justify="center">

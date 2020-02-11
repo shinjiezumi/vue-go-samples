@@ -117,11 +117,10 @@
         if (this.getError === '') {
           const getUser = async () => {
             await this.$store.dispatch("auth/currentUser");
+            this.$router.push('/todo')
           };
 
           getUser();
-
-          this.$router.push('/')
         }
       }
     }

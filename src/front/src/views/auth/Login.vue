@@ -38,6 +38,9 @@
               <v-col>
                 <v-btn color="primary" @click="login">ログイン</v-btn>
               </v-col>
+              <v-col>
+                <v-btn color="primary" @click="testLogin">テストユーザーでログイン</v-btn>
+              </v-col>
             </v-form>
           </v-card>
         </v-col>
@@ -94,11 +97,22 @@
         if (this.getError === '') {
           const getUser = async () => {
             await this.$store.dispatch("auth/currentUser");
+            this.$router.push('/todo')
           };
 
           getUser();
+        }
+      },
+      async testLogin() {
+        await this.$store.dispatch("auth/login", {"email": "test@test.com", "password": "testtest"});
 
-          this.$router.push('/')
+        if (this.getError === '') {
+          const getUser = async () => {
+            await this.$store.dispatch("auth/currentUser");
+            this.$router.push('/todo')
+          };
+
+          getUser();
         }
       }
     }

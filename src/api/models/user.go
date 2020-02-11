@@ -5,13 +5,17 @@ import (
 	"github.com/shinjiezumi/vue-go-samples/src/api/database"
 	"golang.org/x/crypto/bcrypt"
 	"log"
+	"time"
 )
 
+// TODO gormをembeddedする
 type User struct {
-	Id       uint64 `json:"id"`
-	Name     string `json:"name"`
-	Email    string `json:"email"`
-	Password string `json:"password"`
+	Id        uint64 `json:"id"`
+	Name      string `json:"name"`
+	Email     string `json:"email"`
+	Password  string `json:"password"`
+	CreatedAt string `json:"created_at"`
+	UpdatedAt string `json:"updated_at"`
 }
 
 func FindUser(email, password string) *User {
@@ -37,7 +41,8 @@ func StoreUser(name, email, password string) error {
 	}
 	defer db.Close()
 
-	user := User{Name: name, Email: email, Password: hash(password)}
+	now := time.Now().Format("2006-01-02 15:04:05")
+	user := User{Name: name, Email: email, Password: hash(password), CreatedAt: now, UpdatedAt: now}
 	result := db.Create(&user)
 
 	return result.Error
@@ -48,7 +53,6 @@ func hash(password string) string {
 	if err != nil {
 		log.Fatal(err.Error())
 	}
-
 	return string(hash)
 }
 
