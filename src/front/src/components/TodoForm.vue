@@ -25,9 +25,9 @@
               min-width="290px"
           >
             <template v-slot:activator="{ on }">
-              <v-text-field v-model="dateFormatted" label="期限" v-on="on" @blur="date = parseDate(dateFormatted)"/>
+              <v-text-field v-model="dateFormatted" label="期限" v-on="on" @blur="limitDate = parseDate(dateFormatted)"/>
             </template>
-            <v-date-picker v-model="date" no-title @input="menu1 = false"/>
+            <v-date-picker v-model="limitDate" no-title @input="menu1 = false" />
           </v-menu>
         </v-col>
         <v-col>
@@ -36,6 +36,9 @@
               v-model="title"
               label="タイトル"
               required
+              :error-messages="titleErrors"
+              @input="$v.title.$touch()"
+              @blur="$v.title.$touch()"
           />
         </v-col>
         <v-col>
@@ -43,6 +46,9 @@
               type="text"
               v-model="memo"
               label="メモ"
+              :error-messages="memoErrors"
+              @input="$v.memo.$touch()"
+              @blur="$v.memo.$touch()"
           />
         </v-col>
         <v-col>
@@ -58,12 +64,14 @@
 </template>
 
 <script>
+  import { validationMixin } from 'vuelidate'
   import moment from "moment"
   import { formatDate, parseDate } from "../util";
+  import { maxLength, required } from "vuelidate/lib/validators";
 
-  // TODO バリデーション実装
   export default {
     name: "TodoForm",
+    mixins: [validationMixin],
     props: {
       isNew: {
         type: Boolean,
@@ -86,23 +94,45 @@
         default: moment().format("YYYY-MM-DD"),
       },
     },
+    validations: {
+      title: {required, maxLength: maxLength(128)},
+      memo: {maxLength: maxLength(255)},
+    },
     data: vm => ({
       dialog: false,
-      date: vm.todoLimitDate,
+      today: moment(),
+      limitDate: vm.todoLimitDate,
       dateFormatted: vm.formatDate(vm.todoLimitDate),
       title: vm.todoTitle,
       memo: vm.todoMemo,
       menu1: false,
     }),
     watch: {
-      date () {
-        this.dateFormatted = this.formatDate(this.date)
+      limitDate() {
+        this.dateFormatted = this.formatDate(this.limitDate)
       },
     },
     computed: {
       getError() {
         return this.$store.getters['error/getError']
-      }
+      },
+      titleErrors() {
+        const errors = [];
+        if (!this.$v.title.$dirty) return errors;
+
+        !this.$v.title.required && errors.push('タイトルを入力してください');
+        !this.$v.title.maxLength && errors.push('タイトルは128文字以下で入力してください');
+
+        return errors;
+      },
+      memoErrors() {
+        const errors = [];
+        if (!this.$v.memo.$dirty) return errors;
+
+        !this.$v.memo.maxLength && errors.push('タイトルは255文字以下で入力してください');
+
+        return errors;
+      },
     },
     methods: {
       formatDate(date) {
@@ -113,7 +143,7 @@
       },
       getParams() {
         return {
-          limit_date: this.date,
+          limit_date: this.limitDate,
           title: this.title,
           memo: this.memo
         }
@@ -122,6 +152,9 @@
         this.clearForm(true)
       },
       async store() {
+        this.$v.$touch();
+        if (this.$v.$invalid) return;
+
         if (!this.todoId) {
           await this.$store.dispatch('todo/create', {params: this.getParams()});
         } else {
@@ -137,12 +170,13 @@
         if (!this.todoId) {
           this.title = "";
           this.memo = "";
-          this.date = moment().format("YYYY-MM-DD")
+          this.limitDate = moment().format("YYYY-MM-DD")
         } else if (isCancel) {
           this.title = this.todoTitle;
           this.memo = this.todoMemo;
-          this.date = this.todoLimitDate;
+          this.limitDate = this.todoLimitDate;
         }
+        this.$v.$reset();
         this.dialog = false;
       }
     },

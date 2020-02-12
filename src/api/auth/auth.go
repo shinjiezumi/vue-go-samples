@@ -4,6 +4,7 @@ import (
 	"github.com/appleboy/gin-jwt"
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
+	"github.com/shinjiezumi/vue-go-samples/src/api/messages"
 	"github.com/shinjiezumi/vue-go-samples/src/api/models"
 	"log"
 	"net/http"
@@ -29,16 +30,17 @@ func Register(c *gin.Context) {
 	var params registerParams
 	if err := c.ShouldBindBodyWith(&params, binding.JSON); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"message": "email and password is required",
+			"message": messages.MESSAGE_REQUIRED_ERROR,
 		})
 		return
 	}
 
 	// TODO バリデーション＋CSRF
 
+	// TODO エラーハンドリング雑なので見直す
 	if err := models.StoreUser(params.Name, params.Email, params.Password); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"message": "Registration failure",
+			"message": messages.MESSAGE_GENERAL_ERROR,
 		})
 		return
 	}

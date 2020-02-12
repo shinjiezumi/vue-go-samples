@@ -45,18 +45,6 @@
               </div>
             </v-expansion-panel-content>
           </v-expansion-panel>
-          <!-- TODO 期日迫ってるやつ用 -->
-          <!--          <v-expansion-panel>-->
-          <!--            <v-expansion-panel-header disable-icon-rotate>-->
-          <!--              Item-->
-          <!--              <template v-slot:actions>-->
-          <!--                <v-icon color="error">mdi-alert-circle</v-icon>-->
-          <!--              </template>-->
-          <!--            </v-expansion-panel-header>-->
-          <!--            <v-expansion-panel-content>-->
-          <!--              Some content-->
-          <!--            </v-expansion-panel-content>-->
-          <!--          </v-expansion-panel>-->
         </v-expansion-panels>
         <TodoForm is-new />
       </v-col>
@@ -116,6 +104,6 @@
   }
 
   .todo--memo {
-    white-space: pre;
+    white-space: pre-line;
   }
 </style>
