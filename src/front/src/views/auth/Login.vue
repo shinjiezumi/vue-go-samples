@@ -66,8 +66,8 @@
     },
     data() {
       return {
-        email: '',
-        password: '',
+        email: 'test@test.com',
+        password: 'testtest',
       }
     },
     computed: {
