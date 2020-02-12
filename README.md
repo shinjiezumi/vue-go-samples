@@ -1,11 +1,19 @@
 # vue-go-samples
 Vue/Vuex + Go/Gin + MySQLを使ったサンプルアプリ
 
+- Todolist
+
+- goroutine/channelを使った検索アプリ(comming soon...)
+
 ## Todolist
 ![todolist](https://user-images.githubusercontent.com/41136277/74259276-00336980-4d3b-11ea-81cd-ea75b3742971.png)
 
 認証ありの簡単なTODOリストアプリ。
 
+## goroutine/channelを使った検索アプリ
+comming soon...
+
+## 技術スタック
 ### フロントエンド
 - vue
 - vuex
