@@ -10,7 +10,7 @@ Vue/Vuex + Go/Gin + MySQLを使ったサンプルアプリ
 
 認証ありの簡単なTODOリストアプリ。
 
-## goroutine/channelを使った検索アプリ
+## goroutine/channelを使った複数Webサービスを横断した検索アプリ
 comming soon...
 
 ## 技術スタック
