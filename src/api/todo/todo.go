@@ -4,6 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
 	"github.com/shinjiezumi/vue-go-samples/src/api/auth"
+	"github.com/shinjiezumi/vue-go-samples/src/api/messages"
 	"github.com/shinjiezumi/vue-go-samples/src/api/models"
 	"net/http"
 	"strconv"
@@ -29,7 +30,7 @@ func StoreTodo(c *gin.Context) {
 	var params todoParams
 	if err := c.ShouldBindBodyWith(&params, binding.JSON); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"message": "title and limit_date is required",
+			"message": messages.MESSAGE_REQUIRED_ERROR,
 		})
 		return
 	}
@@ -41,12 +42,12 @@ func StoreTodo(c *gin.Context) {
 	err := models.StoreTodo(user.Id, params.Title, params.Memo, params.LimitDate)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
-			"message": "エラーが発生しました",
+			"message": messages.MESSAGE_GENERAL_ERROR,
 		})
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"message": "保存しました",
+		"message": messages.MESSAGE_STORED,
 	})
 }
 
@@ -54,7 +55,7 @@ func ModifyTodo(c *gin.Context) {
 	var params todoParams
 	if err := c.ShouldBindBodyWith(&params, binding.JSON); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"message": "title and limit_date is required",
+			"message": messages.MESSAGE_REQUIRED_ERROR,
 		})
 		return
 	}
@@ -67,12 +68,12 @@ func ModifyTodo(c *gin.Context) {
 	err := models.UpdateTodo(id, user.Id, params.Title, params.Memo, params.LimitDate, params.FinishedAt)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
-			"message": "エラーが発生しました",
+			"message": messages.MESSAGE_GENERAL_ERROR,
 		})
 	}
 
 	c.JSON(200, gin.H{
-		"message": "更新しました",
+		"message": messages.MESSAGE_MODIFIED,
 	})
 }
 
@@ -86,11 +87,11 @@ func RemoveTodo(c *gin.Context) {
 	err := models.DeleteTodo(id, user.Id)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
-			"message": "エラーが発生しました",
+			"message": messages.MESSAGE_GENERAL_ERROR,
 		})
 	}
 
 	c.JSON(200, gin.H{
-		"message": "削除しました",
+		"message": messages.MESSAGE_DELETED,
 	})
 }

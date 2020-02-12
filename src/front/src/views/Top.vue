@@ -5,11 +5,6 @@
         <v-btn to="/todo" text>Todoリスト</v-btn>
       </v-col>
     </v-row>
-    <v-row class="text-center" align="center" justify="center">
-      <v-col>
-        <v-btn to="/hello" text>Hello world</v-btn>
-      </v-col>
-    </v-row>
   </v-content>
 </template>
 

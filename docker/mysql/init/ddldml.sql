@@ -1,3 +1,4 @@
+-- DDL
 create table users
 (
     id                bigint unsigned auto_increment primary key comment 'ユーザーID',
@@ -6,7 +7,7 @@ create table users
     password          varchar(255) not null comment 'パスワード',
     created_at        timestamp    null comment '作成日時',
     updated_at        timestamp    null comment '更新日時',
-    constraint users_name_unique unique (name)
+    constraint users_name_unique unique (name),
     constraint users_email_unique unique (email)
 ) collate = utf8mb4_unicode_ci comment='ユーザー';
 
@@ -22,3 +23,9 @@ create table todos
     updated_at  timestamp not null comment '更新日時',
     index       todos_user_id_index (user_id)
 ) collate = utf8mb4_unicode_ci comment='Todoリスト';
+
+-- DML
+insert into
+    users(name, email, password, created_at, updated_at)
+values
+    ('test', 'test@test.com', '$2a$10$LvsHcEMnYFFe1taM1sSr1eLjoZ740O7o5M5aFB05RuI6yY0mHa.1u', now(), now());
