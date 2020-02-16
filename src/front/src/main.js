@@ -8,8 +8,7 @@ import { getToken } from "./util";
 
 Vue.config.productionTip = false;
 
-
-axios.defaults.baseURL = (process.env.API_ROOT || 'http://localhost:8081') + '/api';
+axios.defaults.baseURL = (process.env.VUE_APP_API_ROOT || 'http://localhost:8081') + '/api';
 axios.interceptors.request.use(config => {
   config.headers['Authorization'] = `Bearer ${getToken()}`;
   return config;

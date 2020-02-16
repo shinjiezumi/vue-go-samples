@@ -19,8 +19,8 @@ create table todos
     memo        varchar(255) null comment 'メモ',
     limit_date  date not null comment '期日',
     finished_at timestamp null comment '完了日',
-    created_at  timestamp not null comment '作成日時',
-    updated_at  timestamp not null comment '更新日時',
+    created_at  timestamp null comment '作成日時',
+    updated_at  timestamp null comment '更新日時',
     index       todos_user_id_index (user_id)
 ) collate = utf8mb4_unicode_ci comment='Todoリスト';
 
