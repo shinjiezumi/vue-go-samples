@@ -7,6 +7,7 @@ import (
 	"github.com/shinjiezumi/vue-go-samples/src/api/todo"
 	"log"
 	"net/http"
+	"os"
 )
 
 func main() {
@@ -34,24 +35,18 @@ func main() {
 		{
 			api.GET("/user", auth.CurrentUser)
 
-			//todoRoute := router.Group("/todo")
-			//{
-			//}
 			api.POST("/todo", todo.StoreTodo)
 			api.GET("/todo/list", todo.GetList)
 			api.PUT("/todo/:id", todo.ModifyTodo)
 			api.DELETE("/todo/:id", todo.RemoveTodo)
-
 		}
 	}
 
-	// Static
-	router.LoadHTMLGlob("templates/*.tmpl")
-	router.GET("/", func(c *gin.Context) {
-		c.HTML(http.StatusOK, "index.tmpl", gin.H{})
-	})
-
-	err := router.Run()
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = "8080"
+	}
+	err := router.Run(":" + port)
 	if err != nil {
 		log.Fatal(err.Error())
 	}
