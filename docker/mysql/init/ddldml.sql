@@ -28,4 +28,4 @@ create table todos
 insert into
     users(name, email, password, created_at, updated_at)
 values
-    ('test', 'test@test.com', '$2a$10$LvsHcEMnYFFe1taM1sSr1eLjoZ740O7o5M5aFB05RuI6yY0mHa.1u', now(), now());
+    ('testuser', 'test@shinjiezumi.work', '$2a$10$LvsHcEMnYFFe1taM1sSr1eLjoZ740O7o5M5aFB05RuI6yY0mHa.1u', now(), now());

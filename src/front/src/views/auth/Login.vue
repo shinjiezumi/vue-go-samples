@@ -66,8 +66,8 @@
     },
     data() {
       return {
-        email: 'test@test.com',
-        password: 'testtest',
+        email: '',
+        password: '',
       }
     },
     computed: {
@@ -104,7 +104,7 @@
         }
       },
       async testLogin() {
-        await this.$store.dispatch("auth/login", {"email": "test@test.com", "password": "testtest"});
+        await this.$store.dispatch("auth/login", {"email": "test@shinjiezumi.work", "password": "testtest"});
 
         if (this.getError === '') {
           const getUser = async () => {
