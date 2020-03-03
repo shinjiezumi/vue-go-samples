@@ -62,12 +62,14 @@ func UpdateTodo(id uint64, userId uint64, title, memo, limitDate string, finishe
 
 	// 更新
 	now := time.Now().Format("2006-01-02 15:04:05")
-	if finishedAt == nil {
+	if finishedAt != nil {
+		todo.FinishedAt = finishedAt
+	} else if title == "" {
+		todo.FinishedAt = nil
+	} else {
 		todo.Title = title
 		todo.Memo = memo
 		todo.LimitDate = limitDate
-	} else {
-		todo.FinishedAt = finishedAt
 	}
 	todo.UpdatedAt = now
 	result = db.Save(todo)

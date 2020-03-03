@@ -12,11 +12,11 @@
             <v-expansion-panel-header :disable-icon-rotate="!!todo.finished_at">
               <div class="d-flex todo--header">
                 <div class="mb-3">
-                  <span class="mr-3"><i class="fas fa-stopwatch mr-3"></i>{{formatDate(todo.limit_date)}}</span>
+                  <span class="mr-3"><i class="fas fa-stopwatch mr-3" />{{formatDate(todo.limit_date)}}</span>
                 </div>
                 <h2>{{todo.title}}</h2>
               </div>
-              <template v-slot:actions v-if="todo.finished_at">
+              <template v-if="todo.finished_at" v-slot:actions>
                 <v-icon color="teal">mdi-check</v-icon>
               </template>
             </v-expansion-panel-header>
@@ -27,6 +27,10 @@
                   <v-btn v-if="!todo.finished_at" class="mx-2" fab dark @click="finish(todo.id)" color="primary"
                          x-small>
                     <v-icon dark>mdi-check</v-icon>
+                  </v-btn>
+                   <v-btn v-else class="mx-2" fab dark @click="unFinished(todo.id)" color="secondary"
+                          x-small>
+                    <v-icon dark>mdi-backspace</v-icon>
                   </v-btn>
                 </span>
                 <span class="mr-3">
@@ -60,6 +64,11 @@
   export default {
     name: "Todo",
     components: {TodoForm},
+    data() {
+      return {
+        isShowFinished: false
+      }
+    },
     created() {
       this.$store.dispatch('todo/getList');
     },
@@ -81,6 +90,16 @@
       async finish(id) {
         const params = {
           finished_at: moment().format("YYYY-MM-DD HH:mm:ss")
+        };
+
+        await this.$store.dispatch('todo/modify', {id, params});
+        if (this.getError === '') {
+          this.$store.dispatch('todo/getList')
+        }
+      },
+      async unFinished(id) {
+        const params = {
+          finished_at: null
         };
 
         await this.$store.dispatch('todo/modify', {id, params});
