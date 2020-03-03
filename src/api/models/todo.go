@@ -19,15 +19,21 @@ type Todo struct {
 	UpdatedAt  string  `json:"updated_at"`
 }
 
-func FindTodos(userId uint64) *[]Todo {
+func FindTodos(userId uint64, isShowFinished string) *[]Todo {
 	db, err := database.Connect()
 	if err != nil {
 		log.Fatal(err.Error())
 	}
 	defer db.Close()
 
+	query := db.Order("limit_date")
+	if isShowFinished == "true" {
+		query = query.Where("user_id = ?", userId)
+	} else {
+		query = query.Where("user_id = ? AND finished_at IS NULL", userId)
+	}
 	var todos []Todo
-	db.Order("limit_date").Where("user_id = ?", userId).Find(&todos)
+	query.Find(&todos)
 
 	return &todos
 }

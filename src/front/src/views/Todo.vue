@@ -5,10 +5,15 @@
         <h1>TodoList</h1>
       </v-col>
     </v-row>
+    <v-layout row wrap justify-center>
+      <v-flex xs12 md2>
+        <v-switch v-model="isShowFinished" :label="`完了済みを表示${isShowFinished ? 'しない' : 'する'}`"/>
+      </v-flex>
+    </v-layout>
     <v-row align="center" justify="center">
       <v-col class="mb-3" cols="12" sm="8">
         <v-expansion-panels multiple>
-          <v-expansion-panel v-for="todo in this.getTodoList" :key="todo.id">
+          <v-expansion-panel v-for="todo in this.todoList" :key="todo.id">
             <v-expansion-panel-header :disable-icon-rotate="!!todo.finished_at">
               <div class="d-flex todo--header">
                 <div class="mb-3">
@@ -70,17 +75,29 @@
       }
     },
     created() {
-      this.$store.dispatch('todo/getList');
+      this.getTodoList();
+    },
+    watch: {
+      isShowFinished() {
+        this.getTodoList()
+      }
     },
     computed: {
-      getTodoList() {
+      todoList() {
         return this.$store.getters['todo/getList']
       },
-      getError() {
+      error() {
         return this.$store.getters['error/getError']
       }
     },
     methods: {
+      getTodoList() {
+        const params = {
+          is_show_finished: this.isShowFinished
+        };
+
+        this.$store.dispatch('todo/getList', params)
+      },
       formatDate(date) {
         return formatDate(date)
       },
@@ -93,8 +110,8 @@
         };
 
         await this.$store.dispatch('todo/modify', {id, params});
-        if (this.getError === '') {
-          this.$store.dispatch('todo/getList')
+        if (this.error === '') {
+          this.getTodoList();
         }
       },
       async unFinished(id) {
@@ -103,14 +120,14 @@
         };
 
         await this.$store.dispatch('todo/modify', {id, params});
-        if (this.getError === '') {
-          this.$store.dispatch('todo/getList')
+        if (this.error === '') {
+          this.getTodoList();
         }
       },
       async remove(id) {
         await this.$store.dispatch('todo/remove', {id});
-        if (this.getError === '') {
-          this.$store.dispatch('todo/getList')
+        if (this.error === '') {
+          this.getTodoList();
         }
       }
     },

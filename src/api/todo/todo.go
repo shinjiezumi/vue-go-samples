@@ -19,7 +19,7 @@ type todoParams struct {
 
 func GetList(c *gin.Context) {
 	user := auth.GetLoginUser(c)
-	todoList := models.FindTodos(user.Id)
+	todoList := models.FindTodos(user.Id, c.DefaultQuery("is_show_finished", "false"))
 
 	c.JSON(http.StatusOK, gin.H{
 		"data": todoList,
