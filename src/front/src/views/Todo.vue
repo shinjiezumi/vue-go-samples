@@ -5,18 +5,26 @@
         <h1>TodoList</h1>
       </v-col>
     </v-row>
+    <v-row v-if="this.error !== ''" class="text-center" justify="center">
+      <v-alert type="error">{{this.error}}</v-alert>
+    </v-row>
+    <v-layout row wrap justify-center>
+      <v-flex xs12 md2>
+        <v-switch v-model="isShowFinished" :label="`完了済みを表示${isShowFinished ? 'しない' : 'する'}`"/>
+      </v-flex>
+    </v-layout>
     <v-row align="center" justify="center">
       <v-col class="mb-3" cols="12" sm="8">
         <v-expansion-panels multiple>
-          <v-expansion-panel v-for="todo in this.getTodoList" :key="todo.id">
+          <v-expansion-panel v-for="todo in this.todoList" :key="todo.id">
             <v-expansion-panel-header :disable-icon-rotate="!!todo.finished_at">
               <div class="d-flex todo--header">
                 <div class="mb-3">
-                  <span class="mr-3"><i class="fas fa-stopwatch mr-3"></i>{{formatDate(todo.limit_date)}}</span>
+                  <span class="mr-3"><i class="fas fa-stopwatch mr-3" />{{formatDate(todo.limit_date)}}</span>
                 </div>
                 <h2>{{todo.title}}</h2>
               </div>
-              <template v-slot:actions v-if="todo.finished_at">
+              <template v-if="todo.finished_at" v-slot:actions>
                 <v-icon color="teal">mdi-check</v-icon>
               </template>
             </v-expansion-panel-header>
@@ -27,6 +35,10 @@
                   <v-btn v-if="!todo.finished_at" class="mx-2" fab dark @click="finish(todo.id)" color="primary"
                          x-small>
                     <v-icon dark>mdi-check</v-icon>
+                  </v-btn>
+                   <v-btn v-else class="mx-2" fab dark @click="unFinished(todo.id)" color="secondary"
+                          x-small>
+                    <v-icon dark>mdi-backspace</v-icon>
                   </v-btn>
                 </span>
                 <span class="mr-3">
@@ -54,24 +66,49 @@
 
 <script>
   import moment from "moment"
-  import { formatDate, parseDate } from "../util";
+  import { formatDate, parseDate, STATUS_UNAUTHORIZED } from "../util";
   import TodoForm from "../components/TodoForm";
 
   export default {
     name: "Todo",
     components: {TodoForm},
+    data() {
+      return {
+        isShowFinished: false
+      }
+    },
     created() {
-      this.$store.dispatch('todo/getList');
+      this.getTodoList();
+    },
+    watch: {
+      isShowFinished() {
+        this.getTodoList()
+      }
     },
     computed: {
-      getTodoList() {
+      todoList() {
         return this.$store.getters['todo/getList']
       },
-      getError() {
+      error() {
         return this.$store.getters['error/getError']
+      },
+      errorCode() {
+        return this.$store.getters['error/getCode']
       }
     },
     methods: {
+      getTodoList() {
+        const params = {
+          is_show_finished: this.isShowFinished
+        };
+
+        (async () => {
+          await this.$store.dispatch('todo/getList', params);
+          if (this.errorCode == STATUS_UNAUTHORIZED) {
+            this.$router.push('/login');
+          }
+        })()
+      },
       formatDate(date) {
         return formatDate(date)
       },
@@ -84,15 +121,36 @@
         };
 
         await this.$store.dispatch('todo/modify', {id, params});
-        if (this.getError === '') {
-          this.$store.dispatch('todo/getList')
+        if (this.isSucceed()) {
+          this.getTodoList();
+        }
+      },
+      async unFinished(id) {
+        const params = {
+          finished_at: null
+        };
+
+        await this.$store.dispatch('todo/modify', {id, params});
+        if (this.isSucceed()) {
+          this.getTodoList();
         }
       },
       async remove(id) {
         await this.$store.dispatch('todo/remove', {id});
-        if (this.getError === '') {
-          this.$store.dispatch('todo/getList')
+        if (this.isSucceed()) {
+          this.getTodoList();
         }
+      },
+      isSucceed() {
+        if (this.error === '') {
+          return true;
+        }
+
+        if (this.errorCode === STATUS_UNAUTHORIZED) {
+          this.$router.push('/login')
+        }
+
+        return false;
       }
     },
   }

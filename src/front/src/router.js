@@ -23,7 +23,7 @@ export default new Router({
       }
     },
     {
-      path: '/Register',
+      path: '/register',
       component: Register,
       meta: {
         title: `会員登録｜${APP_NAME}`,
@@ -38,7 +38,7 @@ export default new Router({
       }
     },
     {
-      path: '/Login',
+      path: '/login',
       component: Login,
       meta: {
         title: `ログイン｜${APP_NAME}`,

@@ -22,7 +22,7 @@ const actions = {
     context.commit('error/setCode', "", {root: true});
     context.commit('error/setError', "", {root: true});
 
-    const response = await axios.get("/todo/list", data);
+    const response = await axios.get("/todo/list", {params: data});
     if (response.status === STATUS_OK) {
       context.commit('setTodoList', response.data.data);
       return
