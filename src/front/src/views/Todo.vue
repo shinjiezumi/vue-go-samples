@@ -47,7 +47,8 @@
                       :todo-title="todo.title"
                       :todo-memo="todo.memo"
                       :todo-limit-date="todo.limit_date"
-                      :is-show-finished="isShowFinished"
+                      @get-todo-list="getTodoList"
+                      @handle-error="handleError"
                   />
                 </span>
                 <span class="mr-3">
@@ -59,7 +60,7 @@
             </v-expansion-panel-content>
           </v-expansion-panel>
         </v-expansion-panels>
-        <TodoForm is-new />
+        <TodoForm @get-todo-list="getTodoList" @handle-error="handleError" is-new />
       </v-col>
     </v-row>
   </v-content>

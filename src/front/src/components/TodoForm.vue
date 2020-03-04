@@ -66,17 +66,13 @@
 <script>
   import { validationMixin } from 'vuelidate'
   import moment from "moment"
-  import { formatDate, parseDate, STATUS_UNAUTHORIZED } from "../util";
+  import { formatDate, parseDate } from "../util";
   import { maxLength, required } from "vuelidate/lib/validators";
 
   export default {
     name: "TodoForm",
     mixins: [validationMixin],
     props: {
-      isShowFinished: {
-        type: Boolean,
-        default: false,
-      },
       isNew: {
         type: Boolean,
         default: false,
@@ -167,15 +163,10 @@
         } else {
           await this.$store.dispatch('todo/modify', {id: this.todoId, params: this.getParams()});
         }
-
-        // TODO 親コンポーネントにまとめたいがemitがうまくいかないので暫定対応
         if (this.error === '') {
-          const params = {
-            is_show_finished: this.isShowFinished
-          };
-          this.$store.dispatch('todo/getList', params)
-        } else if (this.errorCode === STATUS_UNAUTHORIZED) {
-          this.$store.dispatch('auth/logout');
+          this.$emit('get-todo-list')
+        } else {
+          this.$emit('handle-error')
         }
 
         this.clearForm();
