@@ -47,6 +47,7 @@
                       :todo-title="todo.title"
                       :todo-memo="todo.memo"
                       :todo-limit-date="todo.limit_date"
+                      :is-show-finished="isShowFinished"
                   />
                 </span>
                 <span class="mr-3">
@@ -104,8 +105,8 @@
 
         (async () => {
           await this.$store.dispatch('todo/getList', params);
-          if (this.errorCode == STATUS_UNAUTHORIZED) {
-            this.$router.push('/login');
+          if (this.error !== '') {
+            return this.handleError();
           }
         })()
       },
@@ -121,9 +122,10 @@
         };
 
         await this.$store.dispatch('todo/modify', {id, params});
-        if (this.isSucceed()) {
-          this.getTodoList();
+        if (this.error !== '') {
+          return this.handleError();
         }
+        this.getTodoList();
       },
       async unFinished(id) {
         const params = {
@@ -131,26 +133,22 @@
         };
 
         await this.$store.dispatch('todo/modify', {id, params});
-        if (this.isSucceed()) {
-          this.getTodoList();
+        if (this.error !== '') {
+          return this.handleError();
         }
+        this.getTodoList();
       },
       async remove(id) {
         await this.$store.dispatch('todo/remove', {id});
-        if (this.isSucceed()) {
-          this.getTodoList();
+        if (this.error !== '') {
+          return this.handleError();
         }
+        this.getTodoList();
       },
-      isSucceed() {
-        if (this.error === '') {
-          return true;
-        }
-
+      handleError() {
         if (this.errorCode === STATUS_UNAUTHORIZED) {
-          this.$router.push('/login')
+          this.$store.dispatch('auth/logout');
         }
-
-        return false;
       }
     },
   }

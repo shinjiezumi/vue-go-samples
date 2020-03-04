@@ -46,10 +46,7 @@
     },
     methods: {
       logout() {
-        this.$store.commit("auth/setToken", "");
-        this.$store.commit("auth/setUser", "");
-
-        this.$router.push('/login');
+        this.$store.dispatch('auth/logout')
       }
     }
   };
