@@ -26,14 +26,15 @@ func FindTodos(userId uint64, isShowFinished string) *[]Todo {
 	}
 	defer db.Close()
 
-	query := db.Order("limit_date")
+	var query string
 	if isShowFinished == "true" {
-		query = query.Where("user_id = ?", userId)
+		query = "user_id = ?"
 	} else {
-		query = query.Where("user_id = ? AND finished_at IS NULL", userId)
+		query = "user_id = ? AND finished_at IS NULL"
 	}
+
 	var todos []Todo
-	query.Find(&todos)
+	db.Order("limit_date").Where(query, userId).Find(&todos)
 
 	return &todos
 }
@@ -68,6 +69,7 @@ func UpdateTodo(id uint64, userId uint64, title, memo, limitDate string, finishe
 
 	// 更新
 	now := time.Now().Format("2006-01-02 15:04:05")
+	// TODO 雑なので要見直し
 	if finishedAt != nil {
 		todo.FinishedAt = finishedAt
 	} else if title == "" {
