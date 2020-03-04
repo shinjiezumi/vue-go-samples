@@ -161,9 +161,9 @@
           await this.$store.dispatch('todo/modify', {id: this.todoId, params: this.getParams()});
         }
         if (this.getError === '') {
-          this.clearForm();
           this.$store.dispatch('todo/getList')
         }
+        this.clearForm();
       },
       clearForm(isCancel = false) {
         // TODO 編集時は都度fetchする

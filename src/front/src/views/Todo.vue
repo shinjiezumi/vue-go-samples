@@ -5,6 +5,9 @@
         <h1>TodoList</h1>
       </v-col>
     </v-row>
+    <v-row v-if="this.error !== ''" class="text-center" justify="center">
+      <v-alert type="error">{{this.error}}</v-alert>
+    </v-row>
     <v-layout row wrap justify-center>
       <v-flex xs12 md2>
         <v-switch v-model="isShowFinished" :label="`完了済みを表示${isShowFinished ? 'しない' : 'する'}`"/>
@@ -63,7 +66,7 @@
 
 <script>
   import moment from "moment"
-  import { formatDate, parseDate } from "../util";
+  import { formatDate, parseDate, STATUS_UNAUTHORIZED } from "../util";
   import TodoForm from "../components/TodoForm";
 
   export default {
@@ -88,6 +91,9 @@
       },
       error() {
         return this.$store.getters['error/getError']
+      },
+      errorCode() {
+        return this.$store.getters['error/getCode']
       }
     },
     methods: {
@@ -96,7 +102,12 @@
           is_show_finished: this.isShowFinished
         };
 
-        this.$store.dispatch('todo/getList', params)
+        (async () => {
+          await this.$store.dispatch('todo/getList', params);
+          if (this.errorCode == STATUS_UNAUTHORIZED) {
+            this.$router.push('/login');
+          }
+        })()
       },
       formatDate(date) {
         return formatDate(date)
@@ -110,7 +121,7 @@
         };
 
         await this.$store.dispatch('todo/modify', {id, params});
-        if (this.error === '') {
+        if (this.isSucceed()) {
           this.getTodoList();
         }
       },
@@ -120,15 +131,26 @@
         };
 
         await this.$store.dispatch('todo/modify', {id, params});
-        if (this.error === '') {
+        if (this.isSucceed()) {
           this.getTodoList();
         }
       },
       async remove(id) {
         await this.$store.dispatch('todo/remove', {id});
-        if (this.error === '') {
+        if (this.isSucceed()) {
           this.getTodoList();
         }
+      },
+      isSucceed() {
+        if (this.error === '') {
+          return true;
+        }
+
+        if (this.errorCode === STATUS_UNAUTHORIZED) {
+          this.$router.push('/login')
+        }
+
+        return false;
       }
     },
   }
