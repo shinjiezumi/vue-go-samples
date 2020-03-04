@@ -1,5 +1,6 @@
 import axios from "axios"
 import { setToken, STATUS_OK } from "../util";
+import router from "../router";
 
 const state = {
   user: "",
@@ -64,6 +65,12 @@ const actions = {
     context.commit('error/setError', response.data.message, {root: true});
   },
 
+  logout(context) {
+    context.commit("setToken", "");
+    context.commit("setUser", "");
+
+    router.push('/login');
+  }
 };
 
 export default {
