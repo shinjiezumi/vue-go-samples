@@ -8,14 +8,12 @@
     <v-row v-if="this.error !== ''" class="text-center" justify="center">
       <v-alert type="error">{{this.error}}</v-alert>
     </v-row>
-    <v-layout row wrap justify-center>
-      <v-flex xs12 md2>
-        <v-switch v-model="isShowFinished" :label="`完了済みを表示${isShowFinished ? 'しない' : 'する'}`"/>
-      </v-flex>
-    </v-layout>
-    <v-row align="center" justify="center">
-      <v-col class="mb-3" cols="12" sm="8">
-        <v-expansion-panels multiple>
+    <v-row justify="center">
+      <v-switch v-model="isShowFinished" :label="`完了済みを表示${isShowFinished ? 'しない' : 'する'}`"/>
+    </v-row>
+    <v-row justify="center">
+      <v-col class="mb-3" cols="12" xs="12" sm="8">
+        <v-expansion-panels class="todo-container" multiple>
           <v-expansion-panel v-for="todo in this.todoList" :key="todo.id">
             <v-expansion-panel-header :disable-icon-rotate="!!todo.finished_at">
               <div class="d-flex todo--header">
@@ -156,6 +154,9 @@
 </script>
 
 <style scoped>
+  .todo-container{
+    margin-left: 5px;
+  }
   .todo--header {
     flex-direction: column !important;
   }
