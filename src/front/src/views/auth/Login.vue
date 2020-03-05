@@ -41,6 +41,9 @@
               <v-col>
                 <v-btn color="primary" @click="testLogin">テストユーザーでログイン</v-btn>
               </v-col>
+              <v-col>
+                会員登録は<router-link to="/register">こちら</router-link>から
+              </v-col>
             </v-form>
           </v-card>
         </v-col>

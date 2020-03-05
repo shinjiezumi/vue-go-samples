@@ -49,6 +49,9 @@
               <v-col>
                 <v-btn color="primary" @click="register">会員登録</v-btn>
               </v-col>
+              <v-col>
+                アカウントをお持ちの方は<router-link to="/login">こちら</router-link>から
+              </v-col>
             </v-form>
           </v-card>
         </v-col>
