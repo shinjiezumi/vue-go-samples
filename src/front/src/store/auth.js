@@ -23,8 +23,7 @@ const mutations = {
 
 const actions = {
   async login(context, data) {
-    context.commit('error/setCode', "", {root: true});
-    context.commit('error/setError', "", {root: true});
+    context.commit('error/clearError', {}, {root: true});
 
     const response = await axios.post("/login", data);
     if (response.status === STATUS_OK) {
@@ -32,13 +31,11 @@ const actions = {
       return
     }
 
-    context.commit('error/setCode', response.status, {root: true});
-    context.commit('error/setError', response.data.message, {root: true});
+    context.commit('error/setError', {code: response.status, message: response.data.message}, {root: true});
   },
 
   async register(context, data) {
-    context.commit('error/setCode', "", {root: true});
-    context.commit('error/setError', "", {root: true});
+    context.commit('error/clearError', {}, {root: true});
 
     const response = await axios.post("/register", data);
     if (response.status === STATUS_OK) {
@@ -46,13 +43,11 @@ const actions = {
       return
     }
 
-    context.commit('error/setCode', response.status, {root: true});
-    context.commit('error/setError', response.data.message, {root: true});
+    context.commit('error/setError', {code: response.status, message: response.data.message}, {root: true});
   },
 
   async currentUser(context) {
-    context.commit('error/setCode', "", {root: true});
-    context.commit('error/setError', "", {root: true});
+    context.commit('error/clearError', {}, {root: true});
 
     const response = await axios.get("/user",);
     if (response.status === STATUS_OK) {
@@ -61,8 +56,6 @@ const actions = {
     }
 
     context.commit('setUser', "");
-    context.commit('error/setCode', response.status, {root: true});
-    context.commit('error/setError', response.data.message, {root: true});
   },
 
   logout(context) {

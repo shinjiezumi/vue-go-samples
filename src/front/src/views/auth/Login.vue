@@ -61,7 +61,7 @@
     name: "Login",
     mixins: [validationMixin],
     created() {
-      this.$store.dispatch("error/clearError")
+      this.$store.commit("error/clearError")
     },
     validations: {
       email: {required, email},

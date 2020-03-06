@@ -9,26 +9,21 @@ const getters = {
 };
 
 const mutations = {
-  setCode(state, code) {
-    state.code = code
+  setError(context, data) {
+    state.code = data.code;
+    state.message = data.message;
   },
-  setError(state, message) {
-    state.message = message
-  },
-};
-
-const actions = {
-  clearError(context) {
-    context.commit('error/setCode', "", {root: true});
-    context.commit('error/setError', "", {root: true});
+  clearError() {
+    state.code = "";
+    state.message = "";
   }
+
 };
 
 export default {
   namespaced: true,
   state,
   getters,
-  actions,
   mutations,
 }
 
