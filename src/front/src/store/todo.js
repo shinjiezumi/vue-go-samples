@@ -20,8 +20,10 @@ const mutations = {
 const actions = {
   async getList(context, data) {
     context.commit('error/clearError', {}, {root: true});
+    context.commit('loading/setStatus', true, {root: true});
 
     const response = await axios.get("/todo/list", {params: data});
+    context.commit('loading/setStatus', false, {root: true});
     if (response.status === STATUS_OK) {
       context.commit('setTodoList', response.data.data);
       return

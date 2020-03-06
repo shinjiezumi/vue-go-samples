@@ -5,6 +5,9 @@
         <h1>TodoList</h1>
       </v-col>
     </v-row>
+    <v-row v-if="this.isLoadingOn" justify="center">
+      <v-progress-circular :size="50" color="primary" indeterminate />
+    </v-row>
     <v-row v-if="this.error !== ''" class="text-center" justify="center">
       <v-alert type="error">{{this.error}}</v-alert>
     </v-row>
@@ -88,6 +91,9 @@
     computed: {
       todoList() {
         return this.$store.getters['todo/getList']
+      },
+      isLoadingOn() {
+        return this.$store.getters['loading/isOn']
       },
       error() {
         return this.$store.getters['error/getError']
