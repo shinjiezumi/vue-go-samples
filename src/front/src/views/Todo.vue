@@ -8,30 +8,31 @@
     <v-row v-if="this.isLoadingOn" justify="center">
       <v-progress-circular :size="50" color="primary" indeterminate />
     </v-row>
-    <v-row v-if="this.error !== ''" class="text-center" justify="center">
-      <v-alert type="error">{{this.error}}</v-alert>
-    </v-row>
-    <v-row justify="center">
-      <v-switch v-model="isShowFinished" :label="`完了済みを表示${isShowFinished ? 'しない' : 'する'}`"/>
-    </v-row>
-    <v-row justify="center">
-      <v-col class="mb-3" cols="12" xs="12" sm="8">
-        <v-expansion-panels class="todo-container" multiple>
-          <v-expansion-panel v-for="todo in this.todoList" :key="todo.id">
-            <v-expansion-panel-header :disable-icon-rotate="!!todo.finished_at">
-              <div class="d-flex todo--header">
-                <div class="mb-3">
-                  <span class="mr-3"><i class="fas fa-stopwatch mr-3" />{{formatDate(todo.limit_date)}}</span>
+    <div v-else>
+      <v-row v-if="this.error !== ''" class="text-center" justify="center">
+        <v-alert type="error">{{this.error}}</v-alert>
+      </v-row>
+      <v-row justify="center">
+        <v-switch v-model="isShowFinished" :label="`完了済みを表示${isShowFinished ? 'しない' : 'する'}`"/>
+      </v-row>
+      <v-row justify="center">
+        <v-col class="mb-3" cols="12" xs="12" sm="8">
+          <v-expansion-panels class="todo-container" multiple>
+            <v-expansion-panel v-for="todo in this.todoList" :key="todo.id">
+              <v-expansion-panel-header :disable-icon-rotate="!!todo.finished_at">
+                <div class="d-flex todo--header">
+                  <div class="mb-3">
+                    <span class="mr-3"><i class="fas fa-stopwatch mr-3" />{{formatDate(todo.limit_date)}}</span>
+                  </div>
+                  <h2>{{todo.title}}</h2>
                 </div>
-                <h2>{{todo.title}}</h2>
-              </div>
-              <template v-if="todo.finished_at" v-slot:actions>
-                <v-icon color="teal">mdi-check</v-icon>
-              </template>
-            </v-expansion-panel-header>
-            <v-expansion-panel-content class="todo--memo">
-              {{todo.memo}}
-              <div class="text-right">
+                <template v-if="todo.finished_at" v-slot:actions>
+                  <v-icon color="teal">mdi-check</v-icon>
+                </template>
+              </v-expansion-panel-header>
+              <v-expansion-panel-content class="todo--memo">
+                {{todo.memo}}
+                <div class="text-right">
                 <span class="mr-3">
                   <v-btn v-if="!todo.finished_at" class="mx-2" fab dark @click="finish(todo.id)" color="primary"
                          x-small>
@@ -42,7 +43,7 @@
                     <v-icon dark>mdi-backspace</v-icon>
                   </v-btn>
                 </span>
-                <span class="mr-3">
+                  <span class="mr-3">
                   <TodoForm
                       :todo-id="todo.id"
                       :todo-title="todo.title"
@@ -52,18 +53,19 @@
                       @handle-error="handleError"
                   />
                 </span>
-                <span class="mr-3">
+                  <span class="mr-3">
                   <v-btn class="mx-2" fab dark @click="remove(todo.id)" color="red" x-small>
                     <v-icon dark>mdi-delete</v-icon>
                   </v-btn>
                 </span>
-              </div>
-            </v-expansion-panel-content>
-          </v-expansion-panel>
-        </v-expansion-panels>
-        <TodoForm @get-todo-list="getTodoList" @handle-error="handleError" is-new />
-      </v-col>
-    </v-row>
+                </div>
+              </v-expansion-panel-content>
+            </v-expansion-panel>
+          </v-expansion-panels>
+          <TodoForm @get-todo-list="getTodoList" @handle-error="handleError" is-new />
+        </v-col>
+      </v-row>
+    </div>
   </v-content>
 </template>
 
