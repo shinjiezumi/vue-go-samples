@@ -1,3 +1,5 @@
+import { APP_NAME } from "./constants";
+
 export const STATUS_OK = 200;
 export const STATUS_UNAUTHORIZED = 401;
 
@@ -19,4 +21,8 @@ export const parseDate = (date) => {
   if (!date) return null;
 
   return date.replace(/\//g, '-');
+};
+
+export const generateTitle = (pageTitle) => {
+  return `${pageTitle}｜${APP_NAME}`
 };

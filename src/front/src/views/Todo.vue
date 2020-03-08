@@ -71,11 +71,12 @@
 
 <script>
   import moment from "moment"
-  import { formatDate, parseDate, STATUS_UNAUTHORIZED } from "../util";
+  import { formatDate, generateTitle, parseDate, STATUS_UNAUTHORIZED } from "../util";
   import TodoForm from "../components/TodoForm";
 
   export default {
     name: "Todo",
+    title: generateTitle('TodoList'),
     components: {TodoForm},
     data() {
       return {
