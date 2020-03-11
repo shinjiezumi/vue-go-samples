@@ -33,9 +33,9 @@ jobs:
       - checkout
       - cloudrun/init
       - cloudrun/build:
-          tag: 'gcr.io/${GOOGLE_PROJECT_ID}/api-${CIRCLE_SHA1} src/api'
+          tag: 'gcr.io/${GOOGLE_PROJECT_ID}/api src/api'
       - cloudrun/deploy:
-          image: 'gcr.io/${GOOGLE_PROJECT_ID}/api-${CIRCLE_SHA1}'
+          image: 'gcr.io/${GOOGLE_PROJECT_ID}/api'
           platform: managed
           region: ${GOOGLE_COMPUTE_ZONE}
           service-name: api
@@ -51,6 +51,21 @@ jobs:
               echo "Result: ${GCP_API_RESULTS}"
               exit 1;
             fi
+#  front-test:
+  front-build_push_image_cloud_run_mangaged:
+    docker:
+      - image: 'cimg/base:stable'
+    steps:
+      - checkout
+      - cloudrun/init
+      - cloudrun/build:
+          tag: 'gcr.io/${GOOGLE_PROJECT_ID}/front src/front'
+      - cloudrun/deploy:
+          image: 'gcr.io/${GOOGLE_PROJECT_ID}/front'
+          platform: managed
+          region: ${GOOGLE_COMPUTE_ZONE}
+          service-name: front
+          unauthenticated: true
 workflows:
   build_and_deploy_to_managed_workflow:
     jobs:
@@ -58,6 +73,13 @@ workflows:
       - api-build_push_image_cloud_run_mangaged:
           requires:
             - api-test
+          filters:
+            branches:
+              only: master
+#      - front-test
+      - front-build_push_image_cloud_run_mangaged:
+#          requires:
+#            - front-test
           filters:
             branches:
               only: master
