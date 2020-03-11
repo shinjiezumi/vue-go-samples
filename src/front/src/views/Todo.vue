@@ -5,15 +5,17 @@
         <h1>TodoList</h1>
       </v-col>
     </v-row>
-    <v-row v-if="this.isLoadingOn" justify="center">
-      <v-progress-circular :size="50" color="primary" indeterminate />
+    <v-row justify="center">
+      <v-switch v-model="isShowFinished" :label="`完了済みを表示${isShowFinished ? 'しない' : 'する'}`"/>
     </v-row>
+    <div v-if="this.isLoadingOn" >
+      <v-row justify="center">
+        <v-progress-circular :size="50" color="primary" indeterminate />
+      </v-row>
+    </div>
     <div v-else>
       <v-row v-if="this.error !== ''" class="text-center" justify="center">
         <v-alert type="error">{{this.error}}</v-alert>
-      </v-row>
-      <v-row justify="center">
-        <v-switch v-model="isShowFinished" :label="`完了済みを表示${isShowFinished ? 'しない' : 'する'}`"/>
       </v-row>
       <v-row justify="center">
         <v-col class="mb-3" cols="12" xs="12" sm="8">
@@ -71,11 +73,12 @@
 
 <script>
   import moment from "moment"
-  import { formatDate, parseDate, STATUS_UNAUTHORIZED } from "../util";
+  import { formatDate, generateTitle, parseDate, STATUS_UNAUTHORIZED } from "../util";
   import TodoForm from "../components/TodoForm";
 
   export default {
     name: "Todo",
+    title: generateTitle('TodoList'),
     components: {TodoForm},
     data() {
       return {

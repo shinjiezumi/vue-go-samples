@@ -64,9 +64,11 @@
   import { validationMixin } from 'vuelidate'
   import { email, maxLength, minLength, required } from 'vuelidate/lib/validators'
   import { mapGetters } from "vuex";
+  import { generateTitle } from "../../util";
 
   export default {
     name: "Login",
+    title: generateTitle('会員登録'),
     mixins: [validationMixin],
     created() {
       this.$store.commit("error/clearError")

@@ -18,6 +18,17 @@ axios.interceptors.response.use(
   error => error.response || error
 );
 
+const globalMixIn = {
+  created() {
+    let { title } = this.$options;
+    if (title) {
+      document.title = title;
+    }
+  }
+};
+
+Vue.mixin(globalMixIn);
+
 const createApp = async () => {
   await store.dispatch('auth/currentUser');
 

@@ -5,3 +5,11 @@
     </v-container>
   </v-content>
 </template>
+
+<script>
+  import { generateTitle } from "../util";
+
+  export default {
+    title: generateTitle('Not Found'),
+  }
+</script>

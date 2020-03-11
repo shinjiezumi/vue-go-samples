@@ -9,7 +9,10 @@
 </template>
 
 <script>
+  import { generateTitle } from "../util";
+
   export default {
+    title: generateTitle('トップページ'),
     name: "Top"
   }
 </script>
