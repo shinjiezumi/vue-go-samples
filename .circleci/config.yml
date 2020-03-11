@@ -1,0 +1,63 @@
+version: 2.1
+orbs:
+  cloudrun: circleci/gcp-cloud-run@1.0.2
+jobs:
+  api-test:
+    working_directory: /go/src/github.com/{{ORG_NAME}}/{{REPO_NAME}}
+    docker:
+      - image: circleci/golang:1.13.8-buster-browsers-legacy
+      - image: circleci/mysql:5.7
+    steps:
+      - checkout
+      - restore_cache:
+          key: vendor-{{ checksum "src/api/Gopkg.lock" }}
+      - run:
+          name: install packages
+          working_directory: src/api
+          command: |
+            go get -u github.com/codegangsta/gin
+            go get -u github.com/golang/dep/cmd/dep
+            dep ensure
+      - save_cache:
+          key: vendor-{{ checksum "src/api/Gopkg.lock" }}
+          paths:
+            - src/api/vendor
+      - run:
+          name: run tests
+          working_directory: src/api
+          command: go test
+  api-build_push_image_cloud_run_mangaged:
+    docker:
+      - image: 'cimg/base:stable'
+    steps:
+      - checkout
+      - cloudrun/init
+      - cloudrun/build:
+          tag: 'gcr.io/${GOOGLE_PROJECT_ID}/api-${CIRCLE_SHA1} src/api'
+      - cloudrun/deploy:
+          image: 'gcr.io/${GOOGLE_PROJECT_ID}/api-${CIRCLE_SHA1}'
+          platform: managed
+          region: ${GOOGLE_COMPUTE_ZONE}
+          service-name: api
+          unauthenticated: true
+      - run:
+          name: Test managed deployed service.
+          command: >
+            URL="$GCP_DEPLOY_ENDPOINT/api/"
+            GCP_API_RESULTS=$(curl -H 'Content-Type:application/json' -s $URL)
+
+            if [ "$GCP_API_RESULTS" != '{"message":"Vue Go Samples"}' ]; then
+              echo "Result is unexpected"
+              echo "Result: ${GCP_API_RESULTS}"
+              exit 1;
+            fi
+workflows:
+  build_and_deploy_to_managed_workflow:
+    jobs:
+      - api-test
+      - api-build_push_image_cloud_run_mangaged:
+          requires:
+            - api-test
+          filters:
+            branches:
+              only: master
