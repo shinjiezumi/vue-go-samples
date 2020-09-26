@@ -16,8 +16,6 @@ jobs:
           working_directory: src/api
           command: |
             go get -u github.com/codegangsta/gin
-            go get -u github.com/golang/dep/cmd/dep
-            dep ensure
       - save_cache:
           key: vendor-{{ checksum "src/api/Gopkg.lock" }}
           paths:
