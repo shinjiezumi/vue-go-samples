@@ -10,13 +10,11 @@ services:
     ports:
         - 8081:8080
     volumes:
-        - ./src/api:/go/src/github.com/shinjiezumi/vue-go-samples/src/api
-#        - /go/src/github.com/shinjiezumi/go-todo-api/vendor
+      - ./src/api:/go/src
     environment:
       TZ: Asia/Tokyo
     tty:
       true
-#    command: gin -i -p 8080 run
   front:
     build:
       context: .
@@ -27,10 +25,8 @@ services:
       - 8080:8080
     volumes:
       - ./src/front:/app
-#      - /app/node_modules
     stdin_open: true
     tty: true
-#    command: npm run serve
   db:
     build: docker/mysql
     ports:

@@ -7,12 +7,11 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     iputils-ping \
     vim
 
-COPY ./src/api /go/src/github.com/shinjiezumi/vue-go-samples/src/api
+WORKDIR /go/src
+COPY ./src/api /go/src
 
-WORKDIR /go/src/github.com/shinjiezumi/vue-go-samples/src/api
-
-RUN go get -u github.com/codegangsta/gin \
-  && go get -u github.com/golang/dep/cmd/dep
+RUN go build -o go \
+    && go get -u github.com/codegangsta/gin
 
 ENV DBMS="mysql" \
     USER="root" \
