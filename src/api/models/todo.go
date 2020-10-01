@@ -3,7 +3,6 @@ package models
 import (
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/shinjiezumi/vue-go-samples/src/api/database"
-	"log"
 	"time"
 )
 
@@ -20,12 +19,6 @@ type Todo struct {
 }
 
 func FindTodos(userId uint64, isShowFinished string) *[]Todo {
-	db, err := database.Connect()
-	if err != nil {
-		log.Fatal(err.Error())
-	}
-	defer db.Close()
-
 	var query string
 	if isShowFinished == "true" {
 		query = "user_id = ?"
@@ -34,35 +27,23 @@ func FindTodos(userId uint64, isShowFinished string) *[]Todo {
 	}
 
 	var todos []Todo
-	db.Order("limit_date").Where(query, userId).Find(&todos)
+	database.Conn.Order("limit_date").Where(query, userId).Find(&todos)
 
 	return &todos
 }
 
 func StoreTodo(userId uint64, title, memo, limitDate string) error {
-	db, err := database.Connect()
-	if err != nil {
-		log.Fatal(err.Error())
-	}
-	defer db.Close()
-
 	now := time.Now().Format("2006-01-02 15:04:05")
 	todo := Todo{UserId: userId, Title: title, Memo: memo, LimitDate: limitDate, CreatedAt: now, UpdatedAt: now}
-	result := db.Create(&todo)
+	result := database.Conn.Create(&todo)
 
 	return result.Error
 }
 
 func UpdateTodo(id uint64, userId uint64, title, memo, limitDate string, finishedAt *string) error {
-	db, err := database.Connect()
-	if err != nil {
-		log.Fatal(err.Error())
-	}
-	defer db.Close()
-
 	// 取得
 	todo := Todo{}
-	result := db.Where("id = ? AND user_id = ?", id, userId).First(&todo)
+	result := database.Conn.Where("id = ? AND user_id = ?", id, userId).First(&todo)
 	if result.Error != nil {
 		return result.Error
 	}
@@ -80,27 +61,21 @@ func UpdateTodo(id uint64, userId uint64, title, memo, limitDate string, finishe
 		todo.LimitDate = limitDate
 	}
 	todo.UpdatedAt = now
-	result = db.Save(todo)
+	result = database.Conn.Save(todo)
 
 	return result.Error
 }
 
 func DeleteTodo(id uint64, userId uint64) error {
-	db, err := database.Connect()
-	if err != nil {
-		log.Fatal(err.Error())
-	}
-	defer db.Close()
-
 	// 取得
 	todo := Todo{}
-	result := db.Where("id = ? AND user_id = ?", id, userId).First(&todo)
+	result := database.Conn.Where("id = ? AND user_id = ?", id, userId).First(&todo)
 	if result.Error != nil {
 		return result.Error
 	}
 
 	// 削除
-	result = db.Delete(todo)
+	result = database.Conn.Delete(todo)
 
 	return result.Error
 }

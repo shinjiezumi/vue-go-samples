@@ -4,6 +4,7 @@ import (
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/shinjiezumi/vue-go-samples/src/api/auth"
+	"github.com/shinjiezumi/vue-go-samples/src/api/database"
 	"github.com/shinjiezumi/vue-go-samples/src/api/todo"
 	"log"
 	"net/http"
@@ -11,6 +12,8 @@ import (
 )
 
 func main() {
+	database.Initialize()
+
 	router := gin.Default()
 
 	config := cors.DefaultConfig()

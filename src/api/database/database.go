@@ -6,7 +6,9 @@ import (
 	"os"
 )
 
-func Connect() (*gorm.DB, error) {
+var Conn *gorm.DB
+
+func Initialize() {
 	DBMS := os.Getenv("DBMS")
 	USER := os.Getenv("USER")
 	PASS := os.Getenv("PASS")
@@ -14,10 +16,11 @@ func Connect() (*gorm.DB, error) {
 	DBNAME := os.Getenv("DBNAME")
 
 	CONNECT := USER + ":" + PASS + "@" + PROTOCOL + "/" + DBNAME
-	db, err := gorm.Open(DBMS, CONNECT)
+	conn, err := gorm.Open(DBMS, CONNECT)
 
 	if err != nil {
-		return nil, err
+		panic(err)
 	}
-	return db, nil
+
+	Conn = conn
 }

@@ -19,15 +19,9 @@ type User struct {
 }
 
 func FindUser(email, password string) *User {
-	db, err := database.Connect()
-	if err != nil {
-		log.Fatal(err.Error())
-	}
-	defer db.Close()
-
 	user := User{}
-	db.First(&user, "email = ?", email)
-	if err = compare(user.Password, password); err != nil {
+	database.Conn.First(&user, "email = ?", email)
+	if err := compare(user.Password, password); err != nil {
 		return &User{}
 	}
 
@@ -35,15 +29,9 @@ func FindUser(email, password string) *User {
 }
 
 func StoreUser(name, email, password string) error {
-	db, err := database.Connect()
-	if err != nil {
-		log.Fatal(err.Error())
-	}
-	defer db.Close()
-
 	now := time.Now().Format("2006-01-02 15:04:05")
 	user := User{Name: name, Email: email, Password: hash(password), CreatedAt: now, UpdatedAt: now}
-	result := db.Create(&user)
+	result := database.Conn.Create(&user)
 
 	return result.Error
 }
