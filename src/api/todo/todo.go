@@ -26,7 +26,7 @@ func GetList(c *gin.Context) {
 	})
 }
 
-func StoreTodo(c *gin.Context) {
+func Store(c *gin.Context) {
 	var params todoParams
 	if err := c.ShouldBindBodyWith(&params, binding.JSON); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -51,7 +51,7 @@ func StoreTodo(c *gin.Context) {
 	})
 }
 
-func ModifyTodo(c *gin.Context) {
+func Modify(c *gin.Context) {
 	var params todoParams
 	if err := c.ShouldBindBodyWith(&params, binding.JSON); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -77,7 +77,7 @@ func ModifyTodo(c *gin.Context) {
 	})
 }
 
-func RemoveTodo(c *gin.Context) {
+func Remove(c *gin.Context) {
 	id, _ := strconv.ParseUint(c.Param("id"), 10, 64)
 
 	user := auth.GetLoginUser(c)

@@ -38,10 +38,10 @@ func main() {
 		{
 			api.GET("/user", auth.CurrentUser)
 
-			api.POST("/todo", todo.StoreTodo)
-			api.GET("/todo/list", todo.GetList)
-			api.PUT("/todo/:id", todo.ModifyTodo)
-			api.DELETE("/todo/:id", todo.RemoveTodo)
+			api.POST("/todos", todo.Store)
+			api.GET("/todos", todo.GetList)
+			api.PUT("/todos/:id", todo.Modify)
+			api.DELETE("/todos/:id", todo.Remove)
 		}
 	}
 
