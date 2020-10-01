@@ -37,7 +37,6 @@ func Register(c *gin.Context) {
 
 	// TODO バリデーション＋CSRF
 
-	// TODO エラーハンドリング雑なので見直す
 	if err := models.StoreUser(params.Name, params.Email, params.Password); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"message": messages.MESSAGE_GENERAL_ERROR,
