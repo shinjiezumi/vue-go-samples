@@ -32,7 +32,6 @@ comming soon...
 $ git clone https://github.com/shinjiezumi/vue-go-samples.git
 $ cd vue-go-samples
 $ docker-compose up -d
-$ docker-compose exec api dep ensure
 $ docker-compose exec front npm install
 ```
 
