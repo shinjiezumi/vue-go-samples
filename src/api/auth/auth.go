@@ -5,7 +5,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
 	"github.com/shinjiezumi/vue-go-samples/src/api/messages"
-	"github.com/shinjiezumi/vue-go-samples/src/api/models"
+	"github.com/shinjiezumi/vue-go-samples/src/api/models/user"
 	"log"
 	"net/http"
 	"os"
@@ -30,16 +30,16 @@ func Register(c *gin.Context) {
 	var params registerParams
 	if err := c.ShouldBindBodyWith(&params, binding.JSON); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"message": messages.MESSAGE_REQUIRED_ERROR,
+			"message": messages.RequiredError,
 		})
 		return
 	}
 
 	// TODO バリデーション＋CSRF
 
-	if err := models.StoreUser(params.Name, params.Email, params.Password); err != nil {
+	if err := user.StoreUser(params.Name, params.Email, params.Password); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"message": messages.MESSAGE_GENERAL_ERROR,
+			"message": messages.GeneralError,
 		})
 		return
 	}
@@ -58,9 +58,9 @@ func Login(c *gin.Context) {
 }
 
 func CurrentUser(c *gin.Context) {
-	user := GetLoginUser(c)
+	u := GetLoginUser(c)
 	c.JSON(http.StatusOK, gin.H{
-		"name": user.Name,
+		"name": u.Name,
 	})
 }
 
@@ -82,13 +82,13 @@ func MiddlewareFunc() gin.HandlerFunc {
 	return authMiddleware.MiddlewareFunc()
 }
 
-func GetLoginUser(c *gin.Context) *models.User {
+func GetLoginUser(c *gin.Context) *user.User {
 	authMiddleware, err := createAuthMiddleware()
 	if err != nil {
 		log.Fatal("JWT Error:" + err.Error())
 	}
 
-	return authMiddleware.IdentityHandler(c).(*models.User)
+	return authMiddleware.IdentityHandler(c).(*user.User)
 }
 
 func createAuthMiddleware() (*jwt.GinJWTMiddleware, error) {
@@ -100,7 +100,7 @@ func createAuthMiddleware() (*jwt.GinJWTMiddleware, error) {
 		MaxRefresh:  time.Hour,
 		IdentityKey: IdentityKey,
 		PayloadFunc: func(data interface{}) jwt.MapClaims {
-			if v, ok := data.(*models.User); ok {
+			if v, ok := data.(*user.User); ok {
 				return jwt.MapClaims{
 					"id":        v.Id,
 					IdentityKey: v.Name,
@@ -111,7 +111,7 @@ func createAuthMiddleware() (*jwt.GinJWTMiddleware, error) {
 		IdentityHandler: func(c *gin.Context) interface{} {
 			claims := jwt.ExtractClaims(c)
 			id := claims["id"].(float64)
-			return &models.User{
+			return &user.User{
 				Id:   uint64(id),
 				Name: claims[IdentityKey].(string),
 			}
@@ -122,11 +122,11 @@ func createAuthMiddleware() (*jwt.GinJWTMiddleware, error) {
 				return "", jwt.ErrMissingLoginValues
 			}
 
-			user := models.FindUser(loginParams.Email, loginParams.Password)
-			if user.Name != "" {
-				return &models.User{
-					Id:   user.Id,
-					Name: user.Name,
+			u := user.FindUser(loginParams.Email, loginParams.Password)
+			if u.Name != "" {
+				return &user.User{
+					Id:   u.Id,
+					Name: u.Name,
 				}, nil
 			}
 

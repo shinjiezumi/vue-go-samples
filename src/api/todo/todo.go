@@ -5,7 +5,7 @@ import (
 	"github.com/gin-gonic/gin/binding"
 	"github.com/shinjiezumi/vue-go-samples/src/api/auth"
 	"github.com/shinjiezumi/vue-go-samples/src/api/messages"
-	"github.com/shinjiezumi/vue-go-samples/src/api/models"
+	"github.com/shinjiezumi/vue-go-samples/src/api/models/todo"
 	"net/http"
 	"strconv"
 )
@@ -17,20 +17,22 @@ type todoParams struct {
 	FinishedAt *string `form:"finished_at" json:"finished_at"`
 }
 
+// GetList はTodo一覧を取得します
 func GetList(c *gin.Context) {
 	user := auth.GetLoginUser(c)
-	todoList := models.FindTodos(user.Id, c.DefaultQuery("is_show_finished", "false"))
+	todoList := todo.FindTodos(user.Id, c.DefaultQuery("is_show_finished", "false"))
 
 	c.JSON(http.StatusOK, gin.H{
 		"data": todoList,
 	})
 }
 
+// Store はTodoを保存します
 func Store(c *gin.Context) {
 	var params todoParams
 	if err := c.ShouldBindBodyWith(&params, binding.JSON); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"message": messages.MESSAGE_REQUIRED_ERROR,
+			"message": messages.RequiredError,
 		})
 		return
 	}
@@ -39,23 +41,24 @@ func Store(c *gin.Context) {
 
 	user := auth.GetLoginUser(c)
 
-	err := models.StoreTodo(user.Id, params.Title, params.Memo, params.LimitDate)
+	err := todo.StoreTodo(user.Id, params.Title, params.Memo, params.LimitDate)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
-			"message": messages.MESSAGE_GENERAL_ERROR,
+			"message": messages.GeneralError,
 		})
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"message": messages.MESSAGE_STORED,
+		"message": messages.Stored,
 	})
 }
 
+// Modify はTodoを更新します
 func Modify(c *gin.Context) {
 	var params todoParams
 	if err := c.ShouldBindBodyWith(&params, binding.JSON); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"message": messages.MESSAGE_REQUIRED_ERROR,
+			"message": messages.RequiredError,
 		})
 		return
 	}
@@ -65,18 +68,19 @@ func Modify(c *gin.Context) {
 
 	user := auth.GetLoginUser(c)
 
-	err := models.UpdateTodo(id, user.Id, params.Title, params.Memo, params.LimitDate, params.FinishedAt)
+	err := todo.UpdateTodo(id, user.Id, params.Title, params.Memo, params.LimitDate, params.FinishedAt)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
-			"message": messages.MESSAGE_GENERAL_ERROR,
+			"message": messages.GeneralError,
 		})
 	}
 
 	c.JSON(200, gin.H{
-		"message": messages.MESSAGE_MODIFIED,
+		"message": messages.Modified,
 	})
 }
 
+// Remove はTodoを削除します
 func Remove(c *gin.Context) {
 	id, _ := strconv.ParseUint(c.Param("id"), 10, 64)
 
@@ -84,14 +88,14 @@ func Remove(c *gin.Context) {
 
 	// TODO CSRF
 
-	err := models.DeleteTodo(id, user.Id)
+	err := todo.DeleteTodo(id, user.Id)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
-			"message": messages.MESSAGE_GENERAL_ERROR,
+			"message": messages.GeneralError,
 		})
 	}
 
 	c.JSON(200, gin.H{
-		"message": messages.MESSAGE_DELETED,
+		"message": messages.Deleted,
 	})
 }
