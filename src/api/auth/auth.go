@@ -4,6 +4,8 @@ import (
 	"github.com/appleboy/gin-jwt/v2"
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
+	"github.com/shinjiezumi/vue-go-samples/src/api/common"
+	"github.com/shinjiezumi/vue-go-samples/src/api/database"
 	"github.com/shinjiezumi/vue-go-samples/src/api/messages"
 	"github.com/shinjiezumi/vue-go-samples/src/api/models/user"
 	"log"
@@ -37,12 +39,21 @@ func Register(c *gin.Context) {
 
 	// TODO バリデーション＋CSRF
 
-	if err := user.StoreUser(params.Name, params.Email, params.Password); err != nil {
+	repo := user.NewRepository(database.Conn)
+	u := repo.GetUserByEmail(params.Email)
+	if u != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"message": messages.GeneralError,
+			"message": messages.EmailAlreadyExists,
 		})
 		return
 	}
+
+	u = &user.User{
+		Name:     params.Name,
+		Email:    params.Email,
+		Password: common.HashPassword(params.Password),
+	}
+	user.NewRepository(database.Conn).Create(u)
 
 	// JWTトークン発行
 	Login(c)
@@ -122,7 +133,7 @@ func createAuthMiddleware() (*jwt.GinJWTMiddleware, error) {
 				return "", jwt.ErrMissingLoginValues
 			}
 
-			u := user.FindUser(loginParams.Email, loginParams.Password)
+			u := user.NewRepository(database.Conn).FindUser(loginParams.Email, loginParams.Password)
 			if u.Name != "" {
 				return &user.User{
 					Id:   u.Id,

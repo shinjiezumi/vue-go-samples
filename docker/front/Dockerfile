@@ -4,7 +4,3 @@ WORKDIR /app
 
 RUN apk update && \
     npm install -g npm @vue/cli
-
-#COPY ./src/front/package*.json ./
-
-#RUN npm install

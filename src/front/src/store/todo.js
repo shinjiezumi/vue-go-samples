@@ -55,6 +55,22 @@ const actions = {
       context.commit('error/setError', {code: response.status, message: response.data.message}, {root: true});
     }
   },
+  async finished(context, data) {
+    context.commit('error/clearError', {}, {root: true});
+
+    const response = await axios.put("/todos/" + data.id + "/finished");
+    if (response.status !== STATUS_OK) {
+      context.commit('error/setError', {code: response.status, message: response.data.message}, {root: true});
+    }
+  },
+  async unfinished(context, data) {
+    context.commit('error/clearError', {}, {root: true});
+
+    const response = await axios.put("/todos/" + data.id + "/unfinished");
+    if (response.status !== STATUS_OK) {
+      context.commit('error/setError', {code: response.status, message: response.data.message}, {root: true});
+    }
+  },
 };
 
 export default {

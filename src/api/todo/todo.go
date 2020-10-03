@@ -4,10 +4,13 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
 	"github.com/shinjiezumi/vue-go-samples/src/api/auth"
+	"github.com/shinjiezumi/vue-go-samples/src/api/common"
+	"github.com/shinjiezumi/vue-go-samples/src/api/database"
 	"github.com/shinjiezumi/vue-go-samples/src/api/messages"
 	"github.com/shinjiezumi/vue-go-samples/src/api/models/todo"
 	"net/http"
 	"strconv"
+	"time"
 )
 
 type todoParams struct {
@@ -17,18 +20,44 @@ type todoParams struct {
 	FinishedAt *string `form:"finished_at" json:"finished_at"`
 }
 
+type todoResponse struct {
+	Id         uint64 `json:"id"`
+	UserId     uint64 `json:"user_id"`
+	Title      string `json:"title"`
+	Memo       string `json:"memo"`
+	LimitDate  string `json:"limit_date"`
+	FinishedAt string `form:"finished_at" json:"finished_at"`
+}
+
 // GetList はTodo一覧を取得します
 func GetList(c *gin.Context) {
 	user := auth.GetLoginUser(c)
-	todoList := todo.FindTodos(user.Id, c.DefaultQuery("is_show_finished", "false"))
+	isShowFinished := c.DefaultQuery("is_show_finished", "false") == "true"
+
+	todos := todo.NewRepository(database.Conn).GetByUserId(user.Id, isShowFinished)
+	var res []todoResponse
+	for _, t := range todos {
+		var finishedAt string
+		if t.FinishedAt != nil {
+			finishedAt = t.FinishedAt.Format(common.DateFormat)
+		}
+		res = append(res, todoResponse{
+			Id:         t.Id,
+			UserId:     t.UserId,
+			Title:      t.Title,
+			Memo:       t.Memo,
+			LimitDate:  t.LimitDate.Format(common.DateFormat),
+			FinishedAt: finishedAt,
+		})
+	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"data": todoList,
+		"data": res,
 	})
 }
 
-// Store はTodoを保存します
-func Store(c *gin.Context) {
+// Create はTodoを作成します
+func Create(c *gin.Context) {
 	var params todoParams
 	if err := c.ShouldBindBodyWith(&params, binding.JSON); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -39,22 +68,23 @@ func Store(c *gin.Context) {
 
 	// TODO バリデーション＋CSRF
 
-	user := auth.GetLoginUser(c)
-
-	err := todo.StoreTodo(user.Id, params.Title, params.Memo, params.LimitDate)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"message": messages.GeneralError,
-		})
+	u := auth.GetLoginUser(c)
+	limitDate, _ := time.Parse(common.DateFormat, params.LimitDate)
+	t := todo.Todo{
+		UserId:    u.Id,
+		Title:     params.Title,
+		Memo:      params.Memo,
+		LimitDate: limitDate,
 	}
+	todo.NewRepository(database.Conn).Create(&t)
 
 	c.JSON(http.StatusOK, gin.H{
 		"message": messages.Stored,
 	})
 }
 
-// Modify はTodoを更新します
-func Modify(c *gin.Context) {
+// Update はTodoを更新します
+func Update(c *gin.Context) {
 	var params todoParams
 	if err := c.ShouldBindBodyWith(&params, binding.JSON); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
@@ -66,36 +96,119 @@ func Modify(c *gin.Context) {
 
 	// TODO バリデーション＋CSRF
 
-	user := auth.GetLoginUser(c)
+	u := auth.GetLoginUser(c)
 
-	err := todo.UpdateTodo(id, user.Id, params.Title, params.Memo, params.LimitDate, params.FinishedAt)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"message": messages.GeneralError,
+	repo := todo.NewRepository(database.Conn)
+	t := repo.GetById(id)
+	if t == nil {
+		c.JSON(http.StatusNotFound, gin.H{
+			"message": messages.NotFound,
 		})
+		return
+	} else if u.Id != t.UserId {
+		c.JSON(http.StatusForbidden, gin.H{
+			"message": messages.Forbidden,
+		})
+		return
 	}
+
+	t.Title = params.Title
+	t.Memo = params.Memo
+	limitDate, _ := time.Parse(common.DateFormat, params.LimitDate)
+	t.LimitDate = limitDate
+
+	repo.Save(t)
 
 	c.JSON(200, gin.H{
 		"message": messages.Modified,
 	})
 }
 
-// Remove はTodoを削除します
-func Remove(c *gin.Context) {
+// Delete はTodoを削除します
+func Delete(c *gin.Context) {
 	id, _ := strconv.ParseUint(c.Param("id"), 10, 64)
 
-	user := auth.GetLoginUser(c)
+	u := auth.GetLoginUser(c)
 
 	// TODO CSRF
 
-	err := todo.DeleteTodo(id, user.Id)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"message": messages.GeneralError,
+	repo := todo.NewRepository(database.Conn)
+	t := repo.GetById(id)
+	if t == nil {
+		c.JSON(http.StatusNotFound, gin.H{
+			"message": messages.NotFound,
 		})
+		return
+	} else if u.Id != t.UserId {
+		c.JSON(http.StatusForbidden, gin.H{
+			"message": messages.Forbidden,
+		})
+		return
 	}
+
+	repo.Delete(t.Id)
 
 	c.JSON(200, gin.H{
 		"message": messages.Deleted,
+	})
+}
+
+// Finished はTodoを完了済みにします
+func Finished(c *gin.Context) {
+	id, _ := strconv.ParseUint(c.Param("id"), 10, 64)
+
+	u := auth.GetLoginUser(c)
+
+	// TODO CSRF
+
+	repo := todo.NewRepository(database.Conn)
+	t := repo.GetById(id)
+	if t == nil {
+		c.JSON(http.StatusNotFound, gin.H{
+			"message": messages.NotFound,
+		})
+		return
+	} else if u.Id != t.UserId {
+		c.JSON(http.StatusForbidden, gin.H{
+			"message": messages.Forbidden,
+		})
+		return
+	}
+
+	t.Finished(time.Now())
+	repo.Save(t)
+
+	c.JSON(200, gin.H{
+		"message": messages.Modified,
+	})
+}
+
+// UnFinished はTodoを未完了にします
+func UnFinished(c *gin.Context) {
+	id, _ := strconv.ParseUint(c.Param("id"), 10, 64)
+
+	u := auth.GetLoginUser(c)
+
+	// TODO CSRF
+
+	repo := todo.NewRepository(database.Conn)
+	t := repo.GetById(id)
+	if t == nil {
+		c.JSON(http.StatusNotFound, gin.H{
+			"message": messages.NotFound,
+		})
+		return
+	} else if u.Id != t.UserId {
+		c.JSON(http.StatusForbidden, gin.H{
+			"message": messages.Forbidden,
+		})
+		return
+	}
+
+	t.UnFinished()
+	repo.Save(t)
+
+	c.JSON(200, gin.H{
+		"message": messages.Modified,
 	})
 }
