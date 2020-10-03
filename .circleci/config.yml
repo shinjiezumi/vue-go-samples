@@ -10,14 +10,14 @@ jobs:
     steps:
       - checkout
       - restore_cache:
-          key: vendor-{{ checksum "src/api/Gopkg.lock" }}
+          key: vendor-{{ checksum "src/api/go.sum" }}
       - run:
           name: install packages
           working_directory: src/api
           command: |
             go get -u github.com/codegangsta/gin
       - save_cache:
-          key: vendor-{{ checksum "src/api/Gopkg.lock" }}
+          key: vendor-{{ checksum "src/api/go.sum" }}
           paths:
             - src/api/vendor
       - run:
