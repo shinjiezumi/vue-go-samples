@@ -1,7 +1,10 @@
 package messages
 
-const MESSAGE_STORED = "保存しました"
-const MESSAGE_MODIFIED = "更新しました"
-const MESSAGE_DELETED = "削除しました"
-const MESSAGE_GENERAL_ERROR = "エラーが発生しました"
-const MESSAGE_REQUIRED_ERROR = "必須項目がありません"
+const Stored = "保存しました"
+const Modified = "更新しました"
+const Deleted = "削除しました"
+const NotFound = "存在しません"
+const Forbidden = "権限がありません"
+const EmailAlreadyExists = "このメールアドレスでは登録できません"
+const RequiredError = "必須項目がありません"
+const GeneralError = "エラーが発生しました"

@@ -22,7 +22,7 @@ export default new Router({
       component: Register,
       beforeEnter(to, from, next) {
         if (store.getters['auth/check']) {
-          next('/todo')
+          next('/todos')
         } else {
           next()
         }
@@ -33,14 +33,14 @@ export default new Router({
       component: Login,
       beforeEnter(to, from, next) {
         if (store.getters['auth/check']) {
-          next('/todo')
+          next('/todos')
         } else {
           next()
         }
       }
     },
     {
-      path: '/todo',
+      path: '/todos',
       component: Todo,
       beforeEnter(to, from, next) {
         if (!store.getters['auth/check']) {

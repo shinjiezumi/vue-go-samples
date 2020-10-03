@@ -4,6 +4,7 @@ import (
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
 	"github.com/shinjiezumi/vue-go-samples/src/api/auth"
+	"github.com/shinjiezumi/vue-go-samples/src/api/database"
 	"github.com/shinjiezumi/vue-go-samples/src/api/todo"
 	"log"
 	"net/http"
@@ -11,6 +12,8 @@ import (
 )
 
 func main() {
+	database.Initialize()
+
 	router := gin.Default()
 
 	config := cors.DefaultConfig()
@@ -35,10 +38,12 @@ func main() {
 		{
 			api.GET("/user", auth.CurrentUser)
 
-			api.POST("/todo", todo.StoreTodo)
-			api.GET("/todo/list", todo.GetList)
-			api.PUT("/todo/:id", todo.ModifyTodo)
-			api.DELETE("/todo/:id", todo.RemoveTodo)
+			api.POST("/todos", todo.Create)
+			api.GET("/todos", todo.GetList)
+			api.PUT("/todos/:id", todo.Update)
+			api.DELETE("/todos/:id", todo.Delete)
+			api.PUT("/todos/:id/finished", todo.Finished)
+			api.PUT("/todos/:id/unfinished", todo.UnFinished)
 		}
 	}
 

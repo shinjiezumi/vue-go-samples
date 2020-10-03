@@ -56,7 +56,7 @@
   import { mapGetters } from 'vuex'
   import { validationMixin } from 'vuelidate'
   import { email, minLength, required } from 'vuelidate/lib/validators'
-  import { generateTitle } from "../../util";
+  import { generateTitle } from "@/util";
 
   export default {
     name: "Login",
@@ -102,7 +102,7 @@
         if (this.getError === '') {
           const getUser = async () => {
             await this.$store.dispatch("auth/currentUser");
-            this.$router.push('/todo')
+            this.$router.push('/todos')
           };
 
           getUser();
@@ -114,7 +114,7 @@
         if (this.getError === '') {
           const getUser = async () => {
             await this.$store.dispatch("auth/currentUser");
-            this.$router.push('/todo')
+            this.$router.push('/todos')
           };
 
           getUser();
