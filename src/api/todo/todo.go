@@ -26,7 +26,7 @@ type todoResponse struct {
 	Title      string `json:"title"`
 	Memo       string `json:"memo"`
 	LimitDate  string `json:"limit_date"`
-	FinishedAt string `form:"finished_at" json:"finished_at"`
+	FinishedAt string `json:"finished_at"`
 }
 
 // GetList はTodo一覧を取得します
