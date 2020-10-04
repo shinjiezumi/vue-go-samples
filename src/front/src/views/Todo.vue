@@ -26,7 +26,7 @@
                   <div class="mb-3">
                     <span class="mr-3"><i class="fas fa-stopwatch mr-3"/>{{ formatDate(todo.limit_date) }}</span>
                   </div>
-                  <h2>{{ todo.title }}</h2>
+                  <h2 class="todo--title">{{ todo.title }}</h2>
                 </div>
                 <template v-if="todo.finished_at" v-slot:actions>
                   <v-icon color="teal">mdi-check</v-icon>
@@ -164,7 +164,12 @@ export default {
   flex-direction: column !important;
 }
 
+.todo--title {
+  overflow-wrap: anywhere;
+}
+
 .todo--memo {
   white-space: pre-line;
+  overflow-wrap: anywhere;
 }
 </style>
