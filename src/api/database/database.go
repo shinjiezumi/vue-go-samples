@@ -15,7 +15,7 @@ func Initialize() {
 	PROTOCOL := os.Getenv("PROTOCOL")
 	DBNAME := os.Getenv("DBNAME")
 
-	CONNECT := USER + ":" + PASS + "@" + PROTOCOL + "/" + DBNAME + "?charset=utf8mb4&parseTime=true&loc=Asia%2FTokyo"
+	CONNECT := USER + ":" + PASS + "@" + PROTOCOL + "/" + DBNAME + "?charset=utf8mb4&parseTime=true"
 	conn, err := gorm.Open(DBMS, CONNECT)
 
 	if err != nil {
