@@ -17,8 +17,12 @@ func main() {
 	router := gin.Default()
 
 	config := cors.DefaultConfig()
-	config.AllowAllOrigins = true
 	config.AllowHeaders = append(config.AllowHeaders, "Authorization")
+	if gin.Mode() == gin.DebugMode {
+		config.AllowOrigins = []string{"http://localhost:8080"}
+	} else {
+		config.AllowOrigins = []string{"https://vgs.shinjiezumi.work"}
+	}
 	router.Use(cors.New(config))
 
 	// Api
