@@ -1,9 +1,11 @@
 package auth
 
 import (
+	"fmt"
 	"github.com/appleboy/gin-jwt/v2"
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
+	"github.com/go-playground/validator/v10"
 	"github.com/shinjiezumi/vue-go-samples/src/api/common"
 	"github.com/shinjiezumi/vue-go-samples/src/api/database"
 	"github.com/shinjiezumi/vue-go-samples/src/api/messages"
@@ -16,31 +18,33 @@ import (
 
 var secretKey = os.Getenv("JWT_SECRET_KEY")
 
-type login struct {
-	Email    string `form:"email" json:"email" binding:"required"`
-	Password string `form:"password" json:"password" binding:"required"`
+type loginRequest struct {
+	Email    string `json:"email" validate:"required,email,lte=255"`
+	Password string `json:"password" validate:"required,gte=8,lte=16"`
 }
 
-type registerParams struct {
-	Name string `form:"name" json:"name" binding:"required"`
-	login
+type registerRequest struct {
+	Name string `json:"name" validate:"required,lte=255"`
+	loginRequest
 }
 
 var IdentityKey = "name"
 
 func Register(c *gin.Context) {
-	var params registerParams
-	if err := c.ShouldBindBodyWith(&params, binding.JSON); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": messages.RequiredError,
-		})
+	var r registerRequest
+	if err := c.ShouldBindBodyWith(&r, binding.JSON); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
 		return
 	}
 
-	// TODO バリデーション＋CSRF
+	v := validator.New()
+	if err := v.Struct(r); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"message": messages.ExtractValidationErrorMsg(err)})
+		return
+	}
 
 	repo := user.NewRepository(database.Conn)
-	u := repo.GetUserByEmail(params.Email)
+	u := repo.GetUserByEmail(r.Email)
 	if u != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
 			"message": messages.EmailAlreadyExists,
@@ -49,9 +53,9 @@ func Register(c *gin.Context) {
 	}
 
 	u = &user.User{
-		Name:     params.Name,
-		Email:    params.Email,
-		Password: common.HashPassword(params.Password),
+		Name:     r.Name,
+		Email:    r.Email,
+		Password: common.HashPassword(r.Password),
 	}
 	user.NewRepository(database.Conn).Create(u)
 
@@ -60,6 +64,18 @@ func Register(c *gin.Context) {
 }
 
 func Login(c *gin.Context) {
+	var r loginRequest
+	if err := c.ShouldBindBodyWith(&r, binding.JSON); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
+		return
+	}
+
+	v := validator.New()
+	if err := v.Struct(r); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"message": messages.ExtractValidationErrorMsg(err)})
+		return
+	}
+
 	authMiddleware, err := createAuthMiddleware()
 	if err != nil {
 		log.Fatal("JWT Error:" + err.Error())
@@ -128,20 +144,19 @@ func createAuthMiddleware() (*jwt.GinJWTMiddleware, error) {
 			}
 		},
 		Authenticator: func(c *gin.Context) (interface{}, error) {
-			var loginParams login
-			if err := c.ShouldBindBodyWith(&loginParams, binding.JSON); err != nil {
-				return "", jwt.ErrMissingLoginValues
+			var r loginRequest
+			if err := c.ShouldBindBodyWith(&r, binding.JSON); err != nil {
+				return "", fmt.Errorf(err.Error())
 			}
 
-			u := user.NewRepository(database.Conn).FindUser(loginParams.Email, loginParams.Password)
-			if u.Name != "" {
+			if u := user.NewRepository(database.Conn).FindUser(r.Email, r.Password); u != nil {
 				return &user.User{
 					Id:   u.Id,
 					Name: u.Name,
 				}, nil
 			}
 
-			return nil, jwt.ErrFailedAuthentication
+			return "", fmt.Errorf(messages.InvalidEmailOrPassword)
 		},
 		Unauthorized: func(c *gin.Context, code int, message string) {
 			c.JSON(code, gin.H{

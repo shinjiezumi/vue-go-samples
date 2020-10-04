@@ -39,7 +39,7 @@ func (r Repository) FindUser(email, password string) *User {
 	user := User{}
 	r.db.First(&user, "email = ?", email)
 	if err := common.ComparePassword(user.Password, password); err != nil {
-		return &User{}
+		return nil
 	}
 
 	return &user

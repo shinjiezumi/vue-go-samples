@@ -66,7 +66,7 @@
 <script>
   import { validationMixin } from 'vuelidate'
   import moment from "moment"
-  import { formatDate, parseDate } from "../util";
+  import { formatDate, parseDate } from "@/util";
   import { maxLength, required } from "vuelidate/lib/validators";
 
   export default {
@@ -132,7 +132,7 @@
         const errors = [];
         if (!this.$v.memo.$dirty) return errors;
 
-        !this.$v.memo.maxLength && errors.push('タイトルは255文字以下で入力してください');
+        !this.$v.memo.maxLength && errors.push('メモは255文字以下で入力してください');
 
         return errors;
       },
