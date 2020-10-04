@@ -21,8 +21,7 @@ func main() {
 	if gin.Mode() == gin.DebugMode {
 		config.AllowOrigins = []string{"http://localhost:8080"}
 	} else {
-		port := os.Getenv("PORT")
-		config.AllowOrigins = []string{"https://vgs.shinjiezumi.work:" + port}
+		config.AllowOrigins = []string{"https://vgs.shinjiezumi.work"}
 	}
 	router.Use(cors.New(config))
 
