@@ -3,21 +3,22 @@ package todo
 import (
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
+	"github.com/go-playground/validator/v10"
 	"github.com/shinjiezumi/vue-go-samples/src/api/auth"
 	"github.com/shinjiezumi/vue-go-samples/src/api/common"
 	"github.com/shinjiezumi/vue-go-samples/src/api/database"
 	"github.com/shinjiezumi/vue-go-samples/src/api/messages"
 	"github.com/shinjiezumi/vue-go-samples/src/api/models/todo"
 	"net/http"
+	"regexp"
 	"strconv"
 	"time"
 )
 
-type todoParams struct {
-	Title      string  `form:"title" json:"title"`
-	Memo       string  `form:"memo" json:"memo"`
-	LimitDate  string  `form:"limit_date" json:"limit_date"`
-	FinishedAt *string `form:"finished_at" json:"finished_at"`
+type todoRequest struct {
+	Title     string `json:"title" validate:"required,gte=1,lte=128"`
+	Memo      string `json:"memo" validate:"lte=255"`
+	LimitDate string `json:"limit_date" validate:"required,limitDate"`
 }
 
 type todoResponse struct {
@@ -58,22 +59,24 @@ func GetList(c *gin.Context) {
 
 // Create はTodoを作成します
 func Create(c *gin.Context) {
-	var params todoParams
-	if err := c.ShouldBindBodyWith(&params, binding.JSON); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": messages.RequiredError,
-		})
+	var r todoRequest
+	if err := c.ShouldBindBodyWith(&r, binding.JSON); err != nil {
+		c.JSON(http.StatusBadRequest, err.Error())
 		return
 	}
 
-	// TODO バリデーション＋CSRF
+	v := validator.New()
+	_ = v.RegisterValidation("limitDate", validateLimitDate)
+	if err := v.Struct(r); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"message": messages.ExtractValidationErrorMsg(err)})
+		return
+	}
 
-	u := auth.GetLoginUser(c)
-	limitDate, _ := time.Parse(common.DateFormat, params.LimitDate)
+	limitDate, _ := time.Parse(common.DateFormat, r.LimitDate)
 	t := todo.Todo{
-		UserId:    u.Id,
-		Title:     params.Title,
-		Memo:      params.Memo,
+		UserId:    auth.GetLoginUser(c).Id,
+		Title:     r.Title,
+		Memo:      r.Memo,
 		LimitDate: limitDate,
 	}
 	todo.NewRepository(database.Conn).Create(&t)
@@ -85,18 +88,23 @@ func Create(c *gin.Context) {
 
 // Update はTodoを更新します
 func Update(c *gin.Context) {
-	var params todoParams
-	if err := c.ShouldBindBodyWith(&params, binding.JSON); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": messages.RequiredError,
-		})
+	id, err := strconv.ParseUint(c.Param("id"), 10, 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, err.Error())
 		return
 	}
-	id, _ := strconv.ParseUint(c.Param("id"), 10, 64)
 
-	// TODO バリデーション＋CSRF
-
-	u := auth.GetLoginUser(c)
+	var r todoRequest
+	if err := c.ShouldBindBodyWith(&r, binding.JSON); err != nil {
+		c.JSON(http.StatusBadRequest, err.Error())
+		return
+	}
+	v := validator.New()
+	_ = v.RegisterValidation("limitDate", validateLimitDate)
+	if err := v.Struct(r); err != nil {
+		c.JSON(http.StatusBadRequest, gin.H{"message": messages.ExtractValidationErrorMsg(err)})
+		return
+	}
 
 	repo := todo.NewRepository(database.Conn)
 	t := repo.GetById(id)
@@ -105,16 +113,16 @@ func Update(c *gin.Context) {
 			"message": messages.NotFound,
 		})
 		return
-	} else if u.Id != t.UserId {
+	} else if auth.GetLoginUser(c).Id != t.UserId {
 		c.JSON(http.StatusForbidden, gin.H{
 			"message": messages.Forbidden,
 		})
 		return
 	}
 
-	t.Title = params.Title
-	t.Memo = params.Memo
-	limitDate, _ := time.Parse(common.DateFormat, params.LimitDate)
+	t.Title = r.Title
+	t.Memo = r.Memo
+	limitDate, _ := time.Parse(common.DateFormat, r.LimitDate)
 	t.LimitDate = limitDate
 
 	repo.Save(t)
@@ -126,11 +134,11 @@ func Update(c *gin.Context) {
 
 // Delete はTodoを削除します
 func Delete(c *gin.Context) {
-	id, _ := strconv.ParseUint(c.Param("id"), 10, 64)
-
-	u := auth.GetLoginUser(c)
-
-	// TODO CSRF
+	id, err := strconv.ParseUint(c.Param("id"), 10, 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, err.Error())
+		return
+	}
 
 	repo := todo.NewRepository(database.Conn)
 	t := repo.GetById(id)
@@ -139,7 +147,7 @@ func Delete(c *gin.Context) {
 			"message": messages.NotFound,
 		})
 		return
-	} else if u.Id != t.UserId {
+	} else if auth.GetLoginUser(c).Id != t.UserId {
 		c.JSON(http.StatusForbidden, gin.H{
 			"message": messages.Forbidden,
 		})
@@ -155,11 +163,11 @@ func Delete(c *gin.Context) {
 
 // Finished はTodoを完了済みにします
 func Finished(c *gin.Context) {
-	id, _ := strconv.ParseUint(c.Param("id"), 10, 64)
-
-	u := auth.GetLoginUser(c)
-
-	// TODO CSRF
+	id, err := strconv.ParseUint(c.Param("id"), 10, 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, err.Error())
+		return
+	}
 
 	repo := todo.NewRepository(database.Conn)
 	t := repo.GetById(id)
@@ -168,7 +176,7 @@ func Finished(c *gin.Context) {
 			"message": messages.NotFound,
 		})
 		return
-	} else if u.Id != t.UserId {
+	} else if auth.GetLoginUser(c).Id != t.UserId {
 		c.JSON(http.StatusForbidden, gin.H{
 			"message": messages.Forbidden,
 		})
@@ -185,11 +193,11 @@ func Finished(c *gin.Context) {
 
 // UnFinished はTodoを未完了にします
 func UnFinished(c *gin.Context) {
-	id, _ := strconv.ParseUint(c.Param("id"), 10, 64)
-
-	u := auth.GetLoginUser(c)
-
-	// TODO CSRF
+	id, err := strconv.ParseUint(c.Param("id"), 10, 64)
+	if err != nil {
+		c.JSON(http.StatusBadRequest, err.Error())
+		return
+	}
 
 	repo := todo.NewRepository(database.Conn)
 	t := repo.GetById(id)
@@ -198,7 +206,7 @@ func UnFinished(c *gin.Context) {
 			"message": messages.NotFound,
 		})
 		return
-	} else if u.Id != t.UserId {
+	} else if auth.GetLoginUser(c).Id != t.UserId {
 		c.JSON(http.StatusForbidden, gin.H{
 			"message": messages.Forbidden,
 		})
@@ -211,4 +219,9 @@ func UnFinished(c *gin.Context) {
 	c.JSON(200, gin.H{
 		"message": messages.Modified,
 	})
+}
+
+func validateLimitDate(fl validator.FieldLevel) bool {
+	m := regexp.MustCompile("^[0-9]{4}-[0-9]{2}-[0-9]{2}$")
+	return m.MatchString(fl.Field().String())
 }
