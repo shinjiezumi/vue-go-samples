@@ -22,9 +22,9 @@
       </v-row>
       <v-row justify="center">
         <v-col class="mb-3" cols="12" xs="12" sm="8">
-          <v-expansion-panel v-for="result in this.searchResult" :key="result.id">
-            検索結果・・・ {{result}}
-          </v-expansion-panel>
+          <div v-for="result in this.searchResult" :key="result.id">
+            {{result}}
+          </div>
         </v-col>
       </v-row>
     </div>

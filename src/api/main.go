@@ -5,6 +5,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/shinjiezumi/vue-go-samples/src/api/auth"
 	"github.com/shinjiezumi/vue-go-samples/src/api/database"
+	"github.com/shinjiezumi/vue-go-samples/src/api/searcher"
 	"github.com/shinjiezumi/vue-go-samples/src/api/todo"
 	"log"
 	"net/http"
@@ -48,6 +49,8 @@ func main() {
 			api.DELETE("/todos/:id", todo.Delete)
 			api.PUT("/todos/:id/finished", todo.Finished)
 			api.PUT("/todos/:id/unfinished", todo.UnFinished)
+
+			searcher.SetupRoute(api)
 		}
 	}
 
