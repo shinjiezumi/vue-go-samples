@@ -1,0 +1,5 @@
+development:
+  dialect: mysql
+  datasource: ${USER}:${PASS}@${PROTOCOL}/${DBNAME}?charset=utf8mb4&parseTime=true&loc=Asia%2FTokyo
+  dir: database/migrations
+  table: migrations

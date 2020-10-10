@@ -26,12 +26,14 @@ comming soon...
 - gin
 - gorm
 - gin-gwt
+- sql-migrate
 
 ## セットアップ
 ```
 $ git clone https://github.com/shinjiezumi/vue-go-samples.git
 $ cd vue-go-samples
 $ docker-compose up -d
+$ docker-compose exec api sql-migrate up
 $ docker-compose exec front npm install
 ```
 
