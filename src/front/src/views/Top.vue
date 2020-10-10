@@ -1,11 +1,22 @@
 <template>
   <v-content>
     <v-row class="text-center mt-5 pa-3" align="center" justify="center">
-      <IntroduceAppCard
-          app-title="TodoList"
-          app-sub-title="シンプルなTodoアプリです。"
-          app-path="/todos"
-      />
+      <v-col class="mb-4" cols="12" sm="4">
+        <IntroduceAppCard
+            app-title="TodoList"
+            app-sub-title="シンプルなTodoアプリ"
+            app-path="/todos"
+            app-image="/img/TodoList.png"
+        />
+      </v-col>
+      <v-col class="mb-4" cols="12" sm="4">
+        <IntroduceAppCard
+            app-title="Searcher"
+            app-sub-title="複数サイトのコンテンツを検索するアプリ"
+            app-path="/searcher"
+            app-image="https://placehold.jp/300x250.png"
+        />
+      </v-col>
     </v-row>
   </v-content>
 </template>

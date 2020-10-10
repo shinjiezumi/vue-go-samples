@@ -6,6 +6,7 @@ import Login from "./views/auth/Login";
 import Register from "./views/auth/Register";
 import Top from "./views/Top";
 import Todo from "./views/Todo"
+import Searcher from "./views/Searcher.vue"
 import store from "./store"
 
 Vue.use(Router);
@@ -42,6 +43,17 @@ export default new Router({
     {
       path: '/todos',
       component: Todo,
+      beforeEnter(to, from, next) {
+        if (!store.getters['auth/check']) {
+          next('/login')
+        } else {
+          next()
+        }
+      }
+    },
+    {
+      path: '/searcher',
+      component: Searcher,
       beforeEnter(to, from, next) {
         if (!store.getters['auth/check']) {
           next('/login')

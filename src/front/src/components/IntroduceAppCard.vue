@@ -1,14 +1,12 @@
 <template>
-  <v-col class="mb-4" cols="12" sm="4">
-    <v-card class="mx-auto" elevation="5">
-      <v-img src="/img/TodoList.png"/>
-      <v-card-title>{{appTitle}}</v-card-title>
-      <v-card-subtitle>{{appSubTitle}}</v-card-subtitle>
-      <v-card-actions>
-        <v-btn :to="appPath" color="orange lighten-2" text>View</v-btn>
-      </v-card-actions>
-    </v-card>
-  </v-col>
+  <v-card class="mx-auto" elevation="5">
+    <v-img :src="appImage" class="appImage"/>
+    <v-card-title>{{ appTitle }}</v-card-title>
+    <v-card-subtitle class="appSubTitle">{{ appSubTitle }}</v-card-subtitle>
+    <v-card-actions>
+      <v-btn :to="appPath" color="orange lighten-2" text>View</v-btn>
+    </v-card-actions>
+  </v-card>
 </template>
 
 <script>
@@ -23,8 +21,20 @@ export default {
     "appPath": {
       type: String,
     },
+    "appImage": {
+      type: String,
+    }
   }
 }
-
-
 </script>
+
+<style scoped>
+.appImage {
+  height: 250px;
+}
+
+.appSubTitle {
+  height: 2rem;
+  max-height: 2rem;
+}
+</style>

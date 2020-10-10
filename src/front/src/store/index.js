@@ -4,6 +4,7 @@ import Vuex from 'vuex'
 import auth from "./auth";
 import error from "./error";
 import todo from "./todo";
+import searcher from "./searcher";
 import loading from "./loading";
 
 Vue.use(Vuex);
@@ -13,6 +14,7 @@ export default new Vuex.Store({
     auth,
     error,
     todo,
+    searcher,
     loading,
   }
 });
