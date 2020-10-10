@@ -73,7 +73,7 @@
 
 <script>
 import { formatDate, generateTitle, parseDate, STATUS_UNAUTHORIZED } from "@/util";
-import TodoForm from "../components/TodoForm";
+import TodoForm from "../components/todo/TodoForm";
 
 export default {
   name: "Todo",
