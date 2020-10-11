@@ -5,6 +5,7 @@
         <h1>Searcher</h1>
       </v-col>
     </v-row>
+    <!--  検索フィールド  -->
     <v-row justify="center">
       <v-col cols="12" sm="6">
         <v-text-field @keydown.enter="search" v-model="keyword" outlined label="keyword"
@@ -12,19 +13,33 @@
       </v-col>
     </v-row>
     <div v-if="this.isLoadingOn">
+      <!--  ローディング  -->
       <v-row justify="center">
         <v-progress-circular :size="50" color="primary" indeterminate/>
       </v-row>
     </div>
     <div v-else>
+      <!--  エラーメッセージ  -->
       <v-row v-if="this.error !== ''" class="text-center" justify="center">
         <v-alert type="error">{{ this.error }}</v-alert>
       </v-row>
       <v-row justify="center">
         <v-col class="mb-3" cols="12" xs="12" sm="8">
-          <div v-for="result in this.searchResult" :key="result.id">
-            {{result}}
-          </div>
+          <!--  検索結果タブ  -->
+          <v-tabs v-model="tabs" fixed-tabs>
+            <v-tabs-slider></v-tabs-slider>
+            <v-tab v-for="site in sites" :href="'#mobile-tabs-5-'+site" class="primary--text" :key="site">
+              <div class="siteTitle">{{site}}</div>
+            </v-tab>
+          </v-tabs>
+          <!--  検索結果  -->
+          <v-tabs-items v-model="tabs">
+            <v-tab-item v-for="site in sites" :key="site" :value="'mobile-tabs-5-' + site">
+              <div v-for="result in searchResult" :key="result.FeedID">
+                {{ result.Title }}
+              </div>
+            </v-tab-item>
+          </v-tabs-items>
         </v-col>
       </v-row>
     </div>
@@ -39,7 +54,9 @@ export default {
   title: generateTitle('Searcher'),
   data() {
     return {
-      keyword: ""
+      keyword: "",
+      sites: ['Feedly', 'SlideShare', 'Qiita'],
+      tabs: null,
     }
   },
   created() {
@@ -82,4 +99,7 @@ export default {
 </script>
 
 <style scoped>
+.siteTitle {
+  text-transform: none;
+}
 </style>

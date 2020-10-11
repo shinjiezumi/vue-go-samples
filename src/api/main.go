@@ -3,6 +3,7 @@ package main
 import (
 	"github.com/gin-contrib/cors"
 	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
 	"github.com/shinjiezumi/vue-go-samples/src/api/auth"
 	"github.com/shinjiezumi/vue-go-samples/src/api/database"
 	"github.com/shinjiezumi/vue-go-samples/src/api/searcher"
@@ -13,6 +14,11 @@ import (
 )
 
 func main() {
+	if gin.Mode() == gin.DebugMode {
+		if err := godotenv.Load(".env"); err != nil {
+			panic(err)
+		}
+	}
 	database.Initialize()
 
 	router := gin.Default()
