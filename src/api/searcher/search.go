@@ -1,10 +1,14 @@
 package searcher
 
 import (
+	"fmt"
 	"github.com/gin-gonic/gin"
 	searcher "github.com/shinjiezumi/vue-go-samples/src/api/searcher/driver"
+	"github.com/shinjiezumi/vue-go-samples/src/api/searcher/feedly"
 	"net/http"
 	"strconv"
+	"strings"
+	"sync"
 )
 
 type searchResponse struct {
@@ -35,23 +39,44 @@ func Search(c *gin.Context) {
 		panic(err)
 	}
 
+	queries := strings.Split(q, ",")
+	lock := sync.Mutex{}
+	var result []feedly.SearchResponse
+	var wg sync.WaitGroup
+	ch := make(chan struct{}, 4)
 	d := searcher.NewFeedlyDriver()
 	d.Init()
-	result := d.Search(q, count, page)
+	for _, query := range queries {
+		fmt.Printf("%s\n", query)
+		wg.Add(1)
+		go func(query string) {
+			defer wg.Done()
+			ch <- struct{}{}
+
+			res := d.Search(query, count, page)
+			lock.Lock()
+			result = append(result, res)
+			lock.Unlock()
+			<-ch
+		}(query)
+	}
+	wg.Wait()
 
 	res := make([]searchResponse, 0)
-	for _, r := range result.Results {
-		res = append(res, searchResponse{
-			FeedID:      r.FeedID,
-			Title:       r.Title,
-			Description: r.Description,
-			Thumbnail:   r.VisualURL,
-			URL:         r.Website,
-			Tags:        r.DeliciousTags,
-			Subscribers: r.Subscribers,
-		})
-	}
+	for _, v := range result {
+		for _, r := range v.Results {
+			res = append(res, searchResponse{
+				FeedID:      r.FeedID,
+				Title:       r.Title,
+				Description: r.Description,
+				Thumbnail:   r.VisualURL,
+				URL:         r.Website,
+				Tags:        r.DeliciousTags,
+				Subscribers: r.Subscribers,
+			})
+		}
 
+	}
 	c.JSON(http.StatusOK, gin.H{
 		"data": res,
 	})

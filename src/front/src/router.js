@@ -54,13 +54,6 @@ export default new Router({
     {
       path: '/searcher',
       component: Searcher,
-      beforeEnter(to, from, next) {
-        if (!store.getters['auth/check']) {
-          next('/login')
-        } else {
-          next()
-        }
-      }
     },
     {
       path: '/hello',

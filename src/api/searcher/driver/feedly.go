@@ -25,6 +25,13 @@ func (d *FeedlyDriver) Init() {
 }
 
 func (d *FeedlyDriver) Search(keyword string, count, page int) feedly.SearchResponse {
+	var result feedly.SearchResponse
+	if keyword == "" {
+		fmt.Println("keyword is empty")
+		return result
+	}
+	fmt.Println("search start")
+
 	url := fmt.Sprintf("%s/?query=%s&locale=ja&count=%d&page=%d", d.endpoint+"/search/feeds", keyword, count, page)
 	res, err := http.Get(url)
 	if err != nil || res.StatusCode != 200 {
@@ -37,9 +44,9 @@ func (d *FeedlyDriver) Search(keyword string, count, page int) feedly.SearchResp
 		log.Fatal(err)
 	}
 
-	var result feedly.SearchResponse
 	if err := json.Unmarshal(body, &result); err != nil {
 		log.Fatal(err)
 	}
+	fmt.Println("search end")
 	return result
 }

@@ -44,6 +44,7 @@ func main() {
 		api.POST("/login", auth.Login)
 		api.GET("/refresh_token", auth.RefreshToken)
 		api.POST("/register", auth.Register)
+		searcher.SetupRoute(api)
 
 		api.Use(auth.MiddlewareFunc())
 		{
@@ -55,8 +56,6 @@ func main() {
 			api.DELETE("/todos/:id", todo.Delete)
 			api.PUT("/todos/:id/finished", todo.Finished)
 			api.PUT("/todos/:id/unfinished", todo.UnFinished)
-
-			searcher.SetupRoute(api)
 		}
 	}
 
