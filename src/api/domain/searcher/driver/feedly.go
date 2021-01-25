@@ -3,7 +3,7 @@ package searcher
 import (
 	"encoding/json"
 	"fmt"
-	"github.com/shinjiezumi/vue-go-samples/src/api/searcher/feedly"
+	"github.com/shinjiezumi/vue-go-samples/src/api/domain/searcher/feedly"
 	"io/ioutil"
 	"log"
 	"net/http"
@@ -37,7 +37,11 @@ func (d *FeedlyDriver) Search(keyword string, count, page int) feedly.SearchResp
 	if err != nil || res.StatusCode != 200 {
 		log.Fatal(err)
 	}
-	defer res.Body.Close()
+	defer func() {
+		if err := res.Body.Close(); err != nil {
+			log.Fatal(err)
+		}
+	}()
 
 	body, err := ioutil.ReadAll(res.Body)
 	if err != nil {

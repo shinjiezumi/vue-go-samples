@@ -2,16 +2,20 @@ package searcher
 
 import (
 	"fmt"
-	"github.com/gin-gonic/gin"
-	searcher "github.com/shinjiezumi/vue-go-samples/src/api/searcher/driver"
-	"github.com/shinjiezumi/vue-go-samples/src/api/searcher/feedly"
-	"net/http"
-	"strconv"
+	searcher "github.com/shinjiezumi/vue-go-samples/src/api/domain/searcher/driver"
+	"github.com/shinjiezumi/vue-go-samples/src/api/domain/searcher/feedly"
 	"strings"
 	"sync"
 )
 
-type searchResponse struct {
+type SearchUseCase struct {
+}
+
+func NewSearchUseCase() *SearchUseCase {
+	return &SearchUseCase{}
+}
+
+type SearchResponse struct {
 	FeedID      string
 	Title       string
 	Description string
@@ -21,24 +25,7 @@ type searchResponse struct {
 	Subscribers int
 }
 
-// Search は検索して結果を返します
-func Search(c *gin.Context) {
-	q := c.DefaultQuery("q", "")
-	if q == "" {
-		c.JSON(http.StatusOK, gin.H{
-			"data": []searchResponse{},
-		})
-		return
-	}
-	count, err := strconv.Atoi(c.DefaultQuery("count", "20"))
-	if err != nil {
-		panic(err)
-	}
-	page, err := strconv.Atoi(c.DefaultQuery("page", "1"))
-	if err != nil {
-		panic(err)
-	}
-
+func (s SearchUseCase) Execute(q string, count, page int) []SearchResponse {
 	queries := strings.Split(q, ",")
 	lock := sync.Mutex{}
 	var result []feedly.SearchResponse
@@ -62,10 +49,10 @@ func Search(c *gin.Context) {
 	}
 	wg.Wait()
 
-	res := make([]searchResponse, 0)
+	var res []SearchResponse
 	for _, v := range result {
 		for _, r := range v.Results {
-			res = append(res, searchResponse{
+			res = append(res, SearchResponse{
 				FeedID:      r.FeedID,
 				Title:       r.Title,
 				Description: r.Description,
@@ -75,9 +62,6 @@ func Search(c *gin.Context) {
 				Subscribers: r.Subscribers,
 			})
 		}
-
 	}
-	c.JSON(http.StatusOK, gin.H{
-		"data": res,
-	})
+	return res
 }
