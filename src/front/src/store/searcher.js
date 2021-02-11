@@ -25,11 +25,11 @@ const actions = {
     const response = await axios.get("/searcher/search", {params: data});
     context.commit('loading/setStatus', false, {root: true});
     if (response.status === STATUS_OK) {
-      context.commit('setResult', response.data.data);
+      context.commit('setResult', response.data);
       return
     }
 
-    context.commit('error/setError', {code: response.status, message: response.data.message}, {root: true});
+    context.commit('error/setError', {code: response.status, message: response.message}, {root: true});
   },
 };
 

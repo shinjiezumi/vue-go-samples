@@ -1,6 +1,6 @@
-package searcher
+package client
 
-type ApiDriver interface {
+type Client interface {
 	Init()
 	Search(keyword string, count, page string)
 }

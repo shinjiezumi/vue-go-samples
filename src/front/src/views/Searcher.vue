@@ -35,8 +35,8 @@
           <!--  検索結果  -->
           <v-tabs-items v-model="tabs">
             <v-tab-item v-for="site in sites" :key="site" :value="'mobile-tabs-5-' + site">
-              <div v-for="result in searchResult" :key="result.FeedID">
-                {{ result.Title }}
+              <div v-for="data in searchResult[site]" :key="data.ID">
+                {{ data.Title }}
               </div>
             </v-tab-item>
           </v-tabs-items>
