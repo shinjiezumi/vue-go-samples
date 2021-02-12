@@ -16,12 +16,18 @@ func NewSearchUseCase() *searchUseCase {
 }
 
 type SearchResponse struct {
-	Feedly []FeedlyResult
+	Feedly []Feed
 }
 
-type FeedlyResult struct {
-	ID    string
-	Title string
+type Feed struct {
+	ID          string
+	Title       string
+	Description string
+	URL         string
+	Subscribers int
+	Velocity    float32
+	ImageURL    string
+	Tags        []string
 }
 
 const searchCount = 100
@@ -40,13 +46,15 @@ func (s searchUseCase) Execute(q string) SearchResponse {
 	}
 }
 
-func (s searchUseCase) searchFeedly(queries []string) []FeedlyResult {
+func (s searchUseCase) searchFeedly(queries []string) []Feed {
 	lock := sync.Mutex{}
-	var results []feedly.SearchResponse
+	var results []feedly.SearchFeedResponse
 	var wg sync.WaitGroup
 	ch := make(chan struct{}, len(queries))
+
 	d := client.NewFeedlyClient()
 	d.Init()
+
 	for _, query := range queries {
 		fmt.Printf("%s\n", query)
 		wg.Add(1)
@@ -64,12 +72,18 @@ func (s searchUseCase) searchFeedly(queries []string) []FeedlyResult {
 	wg.Wait()
 	close(ch)
 
-	var res []FeedlyResult
+	var res []Feed
 	for _, v := range results {
 		for _, r := range v.Results {
-			res = append(res, FeedlyResult{
-				ID:    r.FeedID,
-				Title: r.Title,
+			res = append(res, Feed{
+				ID:          r.FeedID,
+				Title:       r.Title,
+				Description: r.GetDescription(),
+				URL:         r.GetSiteURL(),
+				Subscribers: r.Subscribers,
+				Velocity:    r.GetVelocity(),
+				ImageURL:    r.GetSiteImageURL(),
+				Tags:        r.DeliciousTags,
 			})
 		}
 	}

@@ -24,8 +24,8 @@ func (d *FeedlyClient) Init() {
 	d.apiToken = os.Getenv("FEEDLY_ACCESS_TOKEN")
 }
 
-func (d *FeedlyClient) Search(keyword string, count, page int) feedly.SearchResponse {
-	var result feedly.SearchResponse
+func (d *FeedlyClient) Search(keyword string, count, page int) feedly.SearchFeedResponse {
+	var result feedly.SearchFeedResponse
 	if keyword == "" {
 		log.Println("keyword is empty")
 		return result
