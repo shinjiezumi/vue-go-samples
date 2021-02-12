@@ -29,15 +29,35 @@
           <v-tabs v-model="tabs" fixed-tabs>
             <v-tabs-slider></v-tabs-slider>
             <v-tab v-for="site in sites" :href="'#mobile-tabs-5-'+site" class="primary--text" :key="site">
-              <div class="siteTitle">{{site}}</div>
+              <div class="siteTitle">{{ site }}</div>
             </v-tab>
           </v-tabs>
           <!--  検索結果  -->
           <v-tabs-items v-model="tabs">
             <v-tab-item v-for="site in sites" :key="site" :value="'mobile-tabs-5-' + site">
-              <div v-for="data in searchResult[site]" :key="data.ID">
-                {{ data.Title }}
-              </div>
+              <!-- リスト -->
+              <v-list two-line>
+                <div v-for="item in searchResult[site]" :key="item.ID">
+                  <!-- アイテム -->
+                  <a :href="item.URL" target="_blank">
+                    <v-list-item>
+                      <v-list-item-avatar>
+                        <v-img :src="item.ImageURL"></v-img>
+                      </v-list-item-avatar>
+                      <v-list-item-content>
+                        <v-list-item-title v-text="item.Title"></v-list-item-title>
+                        <!-- タグ -->
+                        <div class="tag-container">
+                          <v-icon color="teal">mdi-tag</v-icon>
+                          <span v-for="tag in item.Tags" :key="tag" class="tag">{{tag}}</span>
+                        </div>
+                        <div> <v-icon color="teal">mdi-subtitles</v-icon>{{item.Description}}</div>
+                      </v-list-item-content>
+                    </v-list-item>
+                  </a>
+                  <v-divider></v-divider>
+                </div>
+              </v-list>
             </v-tab-item>
           </v-tabs-items>
         </v-col>
@@ -45,6 +65,21 @@
     </div>
   </v-main>
 </template>
+
+<style scoped>
+a {
+  text-decoration: none
+}
+
+.tag-container {
+  display: flex;
+}
+
+.tag {
+  padding: .5rem;
+}
+
+</style>
 
 <script>
 import { generateTitle, STATUS_UNAUTHORIZED } from "@/util";

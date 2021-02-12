@@ -17,7 +17,6 @@ const mutations = {
     state.code = "";
     state.message = "";
   }
-
 };
 
 export default {
