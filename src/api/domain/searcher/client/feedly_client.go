@@ -7,6 +7,7 @@ import (
 	"io/ioutil"
 	"log"
 	"net/http"
+	"net/url"
 	"os"
 )
 
@@ -32,7 +33,7 @@ func (d *FeedlyClient) Search(keyword string, count, page int) feedly.SearchFeed
 	}
 	log.Println("search start")
 
-	url := fmt.Sprintf("%s/?query=%s&locale=ja&count=%d&page=%d", d.endpoint+"/search/feeds", keyword, count, page)
+	url := fmt.Sprintf("%s/?query=%s&locale=ja&count=%d&page=%d", d.endpoint+"/search/feeds", url.QueryEscape(keyword), count, page)
 	req, err := http.NewRequest(http.MethodGet, url, nil)
 	if err != nil {
 		panic(err)

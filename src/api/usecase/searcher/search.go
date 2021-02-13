@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/shinjiezumi/vue-go-samples/src/api/domain/searcher/client"
 	"github.com/shinjiezumi/vue-go-samples/src/api/domain/searcher/feedly"
+	"github.com/shinjiezumi/vue-go-samples/src/api/domain/searcher/slideshare"
 	"strings"
 	"sync"
 )
@@ -16,7 +17,8 @@ func NewSearchUseCase() *searchUseCase {
 }
 
 type SearchResponse struct {
-	Feedly []Feed
+	Feedly     []Feed
+	SlideShare []Slide
 }
 
 type Feed struct {
@@ -30,7 +32,18 @@ type Feed struct {
 	Tags        []string
 }
 
-const searchCount = 100
+type Slide struct {
+	ID            int
+	Title         string
+	Description   string
+	URL           string
+	ImageURL      string
+	EmbedURL      string
+	DownloadURL   string
+	DownloadCount int
+}
+
+const searchCount = 30
 const searchPage = 1
 
 func (s searchUseCase) Execute(q string) SearchResponse {
@@ -39,10 +52,12 @@ func (s searchUseCase) Execute(q string) SearchResponse {
 		return SearchResponse{}
 	}
 
-	feedlyRes := s.searchFeedly(queries)
+	fRes := s.searchFeedly(queries)
+	sRes := s.searchSlide(queries)
 
 	return SearchResponse{
-		Feedly: feedlyRes,
+		Feedly:     fRes,
+		SlideShare: sRes,
 	}
 }
 
@@ -84,6 +99,50 @@ func (s searchUseCase) searchFeedly(queries []string) []Feed {
 				Velocity:    r.GetVelocity(),
 				ImageURL:    r.GetSiteImageURL(),
 				Tags:        r.DeliciousTags,
+			})
+		}
+	}
+	return res
+}
+
+func (s searchUseCase) searchSlide(queries []string) []Slide {
+	lock := sync.Mutex{}
+	var results []slideshare.SearchSlideResponse
+	var wg sync.WaitGroup
+	ch := make(chan struct{}, len(queries))
+
+	c := client.NewSlideShareClient()
+	c.Init()
+
+	for _, query := range queries {
+		fmt.Printf("%s\n", query)
+		wg.Add(1)
+		go func(query string) {
+			defer wg.Done()
+			ch <- struct{}{}
+
+			res := c.Search(query, searchCount, searchPage)
+			lock.Lock()
+			results = append(results, res)
+			lock.Unlock()
+			<-ch
+		}(query)
+	}
+	wg.Wait()
+	close(ch)
+
+	var res []Slide
+	for _, v := range results {
+		for _, r := range v.Results {
+			res = append(res, Slide{
+				ID:            r.ID,
+				Title:         r.Title,
+				Description:   r.Description,
+				URL:           r.URL,
+				ImageURL:      r.ThumbnailURL,
+				EmbedURL:      r.Embed,
+				DownloadURL:   r.DownloadURL,
+				DownloadCount: r.Download,
 			})
 		}
 	}
