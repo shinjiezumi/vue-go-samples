@@ -29,32 +29,42 @@
           <v-tabs v-model="tabs" fixed-tabs>
             <v-tabs-slider></v-tabs-slider>
             <v-tab v-for="site in sites" :href="'#mobile-tabs-5-'+site" class="primary--text" :key="site">
-              <div class="siteTitle">{{ site }}</div>
+              <div class="site-title">{{ site }}</div>
             </v-tab>
           </v-tabs>
           <!--  検索結果  -->
+          <!--  タブ  -->
           <v-tabs-items v-model="tabs">
             <v-tab-item v-for="site in sites" :key="site" :value="'mobile-tabs-5-' + site">
-              <!-- リスト -->
+              <!-- 一覧 -->
               <v-list two-line>
                 <div v-for="item in searchResult[site]" :key="item.ID">
                   <!-- アイテム -->
-                  <a :href="item.URL" target="_blank">
-                    <v-list-item>
-                      <v-list-item-avatar>
-                        <v-img :src="item.ImageURL"></v-img>
-                      </v-list-item-avatar>
-                      <v-list-item-content>
-                        <v-list-item-title v-text="item.Title"></v-list-item-title>
-                        <!-- タグ -->
-                        <div class="tag-container">
-                          <v-icon color="teal">mdi-tag</v-icon>
-                          <span v-for="tag in item.Tags" :key="tag" class="tag">{{tag}}</span>
-                        </div>
-                        <div> <v-icon color="teal">mdi-subtitles</v-icon>{{item.Description}}</div>
-                      </v-list-item-content>
-                    </v-list-item>
-                  </a>
+                  <v-list-item>
+                    <!-- サイト画像 -->
+                    <v-list-item-avatar size="100">
+                      <v-img :src="item.ImageURL"></v-img>
+                    </v-list-item-avatar>
+                    <v-list-item-content>
+                      <!-- タイトル -->
+                      <div class="title-container">
+                        <v-list-item-title class="title" v-text="item.Title"></v-list-item-title>
+                        <a :href="item.URL" target="_blank">
+                          <v-icon>mdi-open-in-new</v-icon>
+                        </a>
+                      </div>
+                      <!-- タグ -->
+                      <div class="tag-container">
+                        <v-icon color="teal">mdi-tag</v-icon>
+                        <span v-for="(tag, i) in item.Tags" :key="tag" class="tag">
+                          {{ tag }}
+                          <span v-if="i !== (item.Tags.length - 1)">,</span>
+                        </span>
+                      </div>
+                      <!-- ディスクリプション -->
+                      <v-list-item-content>{{ item.Description }}</v-list-item-content>
+                    </v-list-item-content>
+                  </v-list-item>
                   <v-divider></v-divider>
                 </div>
               </v-list>
@@ -71,14 +81,26 @@ a {
   text-decoration: none
 }
 
-.tag-container {
+.title-container {
   display: flex;
 }
 
-.tag {
-  padding: .5rem;
+.title {
+  font-size: 1.3rem;
 }
 
+.tag-container {
+  display: flex;
+  margin-top: .5rem;
+}
+
+.tag {
+  padding: .2rem;
+}
+
+.site-title {
+  text-transform: none;
+}
 </style>
 
 <script>
@@ -132,9 +154,3 @@ export default {
   },
 }
 </script>
-
-<style scoped>
-.siteTitle {
-  text-transform: none;
-}
-</style>
