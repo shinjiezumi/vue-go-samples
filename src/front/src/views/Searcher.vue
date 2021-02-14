@@ -42,7 +42,7 @@
           <!--  タブ  -->
           <v-tabs-items v-model="tabs">
             <v-tab-item :key="'Qiita'" :value="'mobile-tabs-5-Qiita'">
-              <FeedList :items="searchResult.Feedly"></FeedList>
+              <QiitaList :items="searchResult.Qiita"></QiitaList>
             </v-tab-item>
             <v-tab-item :key="'SlideShare'" :value="'mobile-tabs-5-SlideShare'">
               <SlideList :items="searchResult.SlideShare"></SlideList>
@@ -69,13 +69,14 @@ a {
 
 <script>
 import { generateTitle, STATUS_UNAUTHORIZED } from "@/util";
+import QiitaList from "../components/searcher/QiitaList"
 import SlideList from "../components/searcher/SlideList"
 import FeedList from "../components/searcher/FeedList"
 
 export default {
   name: "Searcher",
   title: generateTitle('Searcher'),
-  components: {SlideList, FeedList},
+  components: {QiitaList, SlideList, FeedList},
   data() {
     return {
       keyword: "",
@@ -84,7 +85,6 @@ export default {
   },
   created() {
   },
-  watch: {},
   computed: {
     searchResult() {
       return this.$store.getters['searcher/getResult']
@@ -101,7 +101,7 @@ export default {
   },
   methods: {
     search() {
-      if (this.isLoadingOn)
+      if (this.keyword === "" || this.isLoadingOn)
         return
 
       const params = {
