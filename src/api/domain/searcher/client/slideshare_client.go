@@ -4,7 +4,7 @@ import (
 	"crypto/sha1"
 	"encoding/hex"
 	"encoding/xml"
-	"fmt"
+	"github.com/shinjiezumi/vue-go-samples/src/api/common"
 	"github.com/shinjiezumi/vue-go-samples/src/api/domain/searcher/slideshare"
 	"io"
 	"io/ioutil"
@@ -42,54 +42,54 @@ func (c *SlideShareClient) Init() {
 	c.hash = hex.EncodeToString(s.Sum(nil))
 }
 
-func (c *SlideShareClient) Search(keyword string, count, page int) slideshare.SearchSlideResponse {
+func (c *SlideShareClient) Search(keyword string, count, page int) (*slideshare.SearchSlideResponse, error) {
 	var ret slideshare.SearchSlideResponse
 	if keyword == "" {
-		log.Println("keyword is empty")
-		return ret
+		return nil, common.NewApplicationError(http.StatusBadRequest, common.InvalidRequest)
 	}
-	log.Println("search start")
 
+	// URL生成
 	u, err := url.Parse(c.endpoint)
 	if err != nil {
-		log.Fatal(err)
+		return nil, common.NewApplicationError(http.StatusInternalServerError, common.GeneralError)
 	}
 	u.Path = path.Join(u.Path, "search_slideshows")
 
+	// クエリ生成
 	q := u.Query()
 	q.Set("q", url.QueryEscape(keyword))
 	q.Set("page", strconv.Itoa(page))
 	q.Set("items_per_page", strconv.Itoa(count))
 	q = c.addCommonQuery(q)
-
 	u.RawQuery = q.Encode()
-	fmt.Println(u.String())
+
+	// 検索実行
 	req, err := http.NewRequest(http.MethodGet, u.String(), nil)
 	if err != nil {
-		log.Fatal(err)
+		return nil, common.NewApplicationError(http.StatusInternalServerError, common.GeneralError)
 	}
 	hc := new(http.Client)
 	res, err := hc.Do(req)
 	if err != nil {
-		panic(err)
+		return nil, common.NewApplicationError(http.StatusInternalServerError, common.GeneralError)
 	}
 	defer func() {
 		if err := res.Body.Close(); err != nil {
-			log.Fatal(err)
+			panic(err)
 		}
 	}()
 
 	body, err := ioutil.ReadAll(res.Body)
 	if err != nil {
-		log.Fatal(err)
+		return nil, common.NewApplicationError(http.StatusInternalServerError, common.GeneralError)
 	}
 
 	err = xml.Unmarshal(body, &ret)
 	if err != nil {
-		log.Fatal(err)
+		return nil, common.NewApplicationError(http.StatusInternalServerError, common.GeneralError)
 	}
-	log.Println("search end")
-	return ret
+
+	return &ret, nil
 }
 
 func (c *SlideShareClient) addCommonQuery(q url.Values) url.Values {

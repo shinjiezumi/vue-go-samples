@@ -1,17 +1,17 @@
 package searcher
 
 import (
-	"fmt"
+	"context"
 	"github.com/shinjiezumi/vue-go-samples/src/api/domain/searcher/client"
 	"github.com/shinjiezumi/vue-go-samples/src/api/domain/searcher/feedly"
 	"github.com/shinjiezumi/vue-go-samples/src/api/domain/searcher/qiita"
 	"github.com/shinjiezumi/vue-go-samples/src/api/domain/searcher/slideshare"
+	"golang.org/x/sync/errgroup"
 	"strings"
 	"sync"
 )
 
-type searchUseCase struct {
-}
+type searchUseCase struct{}
 
 func NewSearchUseCase() *searchUseCase {
 	return &searchUseCase{}
@@ -63,9 +63,10 @@ func (s searchUseCase) Execute(q string) SearchResponse {
 		return SearchResponse{}
 	}
 
-	fRes := s.searchFeedly(queries)
-	sRes := s.searchSlide(queries)
-	qRes := s.searchQiitaItem(queries)
+	// TODO エラー返す
+	fRes, _ := s.searchFeedly(queries)
+	sRes, _ := s.searchSlide(queries)
+	qRes, _ := s.searchQiitaItem(queries)
 
 	return SearchResponse{
 		Feedly:     fRes,
@@ -74,31 +75,33 @@ func (s searchUseCase) Execute(q string) SearchResponse {
 	}
 }
 
-func (s searchUseCase) searchFeedly(queries []string) []Feed {
+func (s searchUseCase) searchFeedly(queries []string) ([]Feed, error) {
 	lock := sync.Mutex{}
 	var results []feedly.SearchFeedResponse
-	var wg sync.WaitGroup
-	ch := make(chan struct{}, len(queries))
 
+	eg, ctx := errgroup.WithContext(context.Background())
 	d := client.NewFeedlyClient()
 	d.Init()
-
 	for _, query := range queries {
-		fmt.Printf("%s\n", query)
-		wg.Add(1)
-		go func(query string) {
-			defer wg.Done()
-			ch <- struct{}{}
-
-			res := d.Search(query, searchCount, searchPage)
-			lock.Lock()
-			results = append(results, res)
-			lock.Unlock()
-			<-ch
-		}(query)
+		eg.Go(func() error {
+			select {
+			case <-ctx.Done():
+				return nil
+			default:
+				res, err := d.Search(query, searchCount, searchPage)
+				if err != nil {
+					return err
+				}
+				lock.Lock()
+				results = append(results, *res)
+				lock.Unlock()
+				return nil
+			}
+		})
 	}
-	wg.Wait()
-	close(ch)
+	if err := eg.Wait(); err != nil {
+		return nil, err
+	}
 
 	var res []Feed
 	for _, v := range results {
@@ -115,34 +118,36 @@ func (s searchUseCase) searchFeedly(queries []string) []Feed {
 			})
 		}
 	}
-	return res
+	return res, nil
 }
 
-func (s searchUseCase) searchSlide(queries []string) []Slide {
+func (s searchUseCase) searchSlide(queries []string) ([]Slide, error) {
 	lock := sync.Mutex{}
 	var results []slideshare.SearchSlideResponse
-	var wg sync.WaitGroup
-	ch := make(chan struct{}, len(queries))
 
+	eg, ctx := errgroup.WithContext(context.Background())
 	c := client.NewSlideShareClient()
 	c.Init()
-
 	for _, query := range queries {
-		fmt.Printf("%s\n", query)
-		wg.Add(1)
-		go func(query string) {
-			defer wg.Done()
-			ch <- struct{}{}
-
-			res := c.Search(query, searchCount, searchPage)
-			lock.Lock()
-			results = append(results, res)
-			lock.Unlock()
-			<-ch
-		}(query)
+		eg.Go(func() error {
+			select {
+			case <-ctx.Done():
+				return nil
+			default:
+				res, err := c.Search(query, searchCount, searchPage)
+				if err != nil {
+					return err
+				}
+				lock.Lock()
+				results = append(results, *res)
+				lock.Unlock()
+				return nil
+			}
+		})
 	}
-	wg.Wait()
-	close(ch)
+	if err := eg.Wait(); err != nil {
+		return nil, err
+	}
 
 	var res []Slide
 	for _, v := range results {
@@ -159,34 +164,36 @@ func (s searchUseCase) searchSlide(queries []string) []Slide {
 			})
 		}
 	}
-	return res
+	return res, nil
 }
 
-func (s searchUseCase) searchQiitaItem(queries []string) []QiitaItem {
+func (s searchUseCase) searchQiitaItem(queries []string) ([]QiitaItem, error) {
 	lock := sync.Mutex{}
 	var results []qiita.SearchItemResponse
-	var wg sync.WaitGroup
-	ch := make(chan struct{}, len(queries))
 
+	eg, ctx := errgroup.WithContext(context.Background())
 	c := client.NewQiitaClient()
 	c.Init()
-
 	for _, query := range queries {
-		fmt.Printf("%s\n", query)
-		wg.Add(1)
-		go func(query string) {
-			defer wg.Done()
-			ch <- struct{}{}
-
-			res := c.Search(query, searchCount, searchPage)
-			lock.Lock()
-			results = append(results, res)
-			lock.Unlock()
-			<-ch
-		}(query)
+		eg.Go(func() error {
+			select {
+			case <-ctx.Done():
+				return nil
+			default:
+				res, err := c.Search(query, searchCount, searchPage)
+				if err != nil {
+					return err
+				}
+				lock.Lock()
+				results = append(results, res)
+				lock.Unlock()
+				return nil
+			}
+		})
 	}
-	wg.Wait()
-	close(ch)
+	if err := eg.Wait(); err != nil {
+		return nil, err
+	}
 
 	var res []QiitaItem
 	for _, v := range results {
@@ -201,5 +208,5 @@ func (s searchUseCase) searchQiitaItem(queries []string) []QiitaItem {
 			})
 		}
 	}
-	return res
+	return res, nil
 }
