@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/shinjiezumi/vue-go-samples/src/api/domain/searcher/client"
 	"github.com/shinjiezumi/vue-go-samples/src/api/domain/searcher/feedly"
+	"github.com/shinjiezumi/vue-go-samples/src/api/domain/searcher/qiita"
 	"github.com/shinjiezumi/vue-go-samples/src/api/domain/searcher/slideshare"
 	"strings"
 	"sync"
@@ -19,6 +20,7 @@ func NewSearchUseCase() *searchUseCase {
 type SearchResponse struct {
 	Feedly     []Feed
 	SlideShare []Slide
+	Qiita      []QiitaItem
 }
 
 type Feed struct {
@@ -43,6 +45,15 @@ type Slide struct {
 	DownloadCount int
 }
 
+type QiitaItem struct {
+	ID        string
+	Title     string
+	LikeCount int
+	Tags      []string
+	URL       string
+	PVCount   int
+}
+
 const searchCount = 30
 const searchPage = 1
 
@@ -54,10 +65,12 @@ func (s searchUseCase) Execute(q string) SearchResponse {
 
 	fRes := s.searchFeedly(queries)
 	sRes := s.searchSlide(queries)
+	qRes := s.searchQiitaItem(queries)
 
 	return SearchResponse{
 		Feedly:     fRes,
 		SlideShare: sRes,
+		Qiita:      qRes,
 	}
 }
 
@@ -143,6 +156,48 @@ func (s searchUseCase) searchSlide(queries []string) []Slide {
 				EmbedURL:      r.Embed,
 				DownloadURL:   r.DownloadURL,
 				DownloadCount: r.Download,
+			})
+		}
+	}
+	return res
+}
+
+func (s searchUseCase) searchQiitaItem(queries []string) []QiitaItem {
+	lock := sync.Mutex{}
+	var results []qiita.SearchItemResponse
+	var wg sync.WaitGroup
+	ch := make(chan struct{}, len(queries))
+
+	c := client.NewQiitaClient()
+	c.Init()
+
+	for _, query := range queries {
+		fmt.Printf("%s\n", query)
+		wg.Add(1)
+		go func(query string) {
+			defer wg.Done()
+			ch <- struct{}{}
+
+			res := c.Search(query, searchCount, searchPage)
+			lock.Lock()
+			results = append(results, res)
+			lock.Unlock()
+			<-ch
+		}(query)
+	}
+	wg.Wait()
+	close(ch)
+
+	var res []QiitaItem
+	for _, v := range results {
+		for _, r := range v {
+			res = append(res, QiitaItem{
+				ID:        r.ID,
+				Title:     r.Title,
+				LikeCount: r.LikesCount,
+				Tags:      r.Tags.GetTags(),
+				URL:       r.URL,
+				PVCount:   r.PageViewsCount,
 			})
 		}
 	}
