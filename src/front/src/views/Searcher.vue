@@ -28,46 +28,27 @@
           <!--  検索結果タブ  -->
           <v-tabs v-model="tabs" fixed-tabs>
             <v-tabs-slider></v-tabs-slider>
-            <v-tab v-for="site in sites" :href="'#mobile-tabs-5-'+site" class="primary--text" :key="site">
-              <div class="site-title">{{ site }}</div>
+            <v-tab :href="'#mobile-tabs-5-Qiita'" class="primary--text" :key="'Qiita'">
+              <div class="site-title">Qiita</div>
+            </v-tab>
+            <v-tab :href="'#mobile-tabs-5-SlideShare'" class="primary--text" :key="'SlideShare'">
+              <div class="site-title">SlideShare</div>
+            </v-tab>
+            <v-tab :href="'#mobile-tabs-5-Feedly'" class="primary--text" :key="'Feedly'">
+              <div class="site-title">Feedly</div>
             </v-tab>
           </v-tabs>
           <!--  検索結果  -->
           <!--  タブ  -->
           <v-tabs-items v-model="tabs">
-            <v-tab-item v-for="site in sites" :key="site" :value="'mobile-tabs-5-' + site">
-              <!-- 一覧 -->
-              <v-list two-line>
-                <div v-for="item in searchResult[site]" :key="item.ID">
-                  <!-- アイテム -->
-                  <v-list-item>
-                    <!-- サイト画像 -->
-                    <v-list-item-avatar size="100">
-                      <v-img :src="item.ImageURL"></v-img>
-                    </v-list-item-avatar>
-                    <v-list-item-content>
-                      <!-- タイトル -->
-                      <div class="title-container">
-                        <v-list-item-title class="title" v-text="item.Title"></v-list-item-title>
-                        <a :href="item.URL" target="_blank">
-                          <v-icon>mdi-open-in-new</v-icon>
-                        </a>
-                      </div>
-                      <!-- タグ -->
-                      <div class="tag-container">
-                        <v-icon color="teal">mdi-tag</v-icon>
-                        <span v-for="(tag, i) in item.Tags" :key="tag" class="tag">
-                          {{ tag }}
-                          <span v-if="i !== (item.Tags.length - 1)">,</span>
-                        </span>
-                      </div>
-                      <!-- ディスクリプション -->
-                      <v-list-item-content>{{ item.Description }}</v-list-item-content>
-                    </v-list-item-content>
-                  </v-list-item>
-                  <v-divider></v-divider>
-                </div>
-              </v-list>
+            <v-tab-item :key="'Qiita'" :value="'mobile-tabs-5-Qiita'">
+              <FeedList :items="searchResult.Feedly"></FeedList>
+            </v-tab-item>
+            <v-tab-item :key="'SlideShare'" :value="'mobile-tabs-5-SlideShare'">
+              <SlideList :items="searchResult.SlideShare"></SlideList>
+            </v-tab-item>
+            <v-tab-item :key="'Feedly'" :value="'mobile-tabs-5-Feedly'">
+              <FeedList :items="searchResult.Feedly"></FeedList>
             </v-tab-item>
           </v-tabs-items>
         </v-col>
@@ -81,23 +62,6 @@ a {
   text-decoration: none
 }
 
-.title-container {
-  display: flex;
-}
-
-.title {
-  font-size: 1.3rem;
-}
-
-.tag-container {
-  display: flex;
-  margin-top: .5rem;
-}
-
-.tag {
-  padding: .2rem;
-}
-
 .site-title {
   text-transform: none;
 }
@@ -105,14 +69,16 @@ a {
 
 <script>
 import { generateTitle, STATUS_UNAUTHORIZED } from "@/util";
+import SlideList from "../components/searcher/SlideList"
+import FeedList from "../components/searcher/FeedList"
 
 export default {
   name: "Searcher",
   title: generateTitle('Searcher'),
+  components: {SlideList, FeedList},
   data() {
     return {
       keyword: "",
-      sites: ['Feedly', 'SlideShare', 'Qiita'],
       tabs: null,
     }
   },
@@ -135,6 +101,9 @@ export default {
   },
   methods: {
     search() {
+      if (this.isLoadingOn)
+        return
+
       const params = {
         q: this.keyword
       };

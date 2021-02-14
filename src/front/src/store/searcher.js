@@ -2,7 +2,11 @@ import axios from "axios"
 import { STATUS_OK } from "@/util";
 
 const state = {
-  searchResult: {},
+  searchResult: {
+    Qiita: [],
+    SlideShare: [],
+    Feedly: [],
+  },
 };
 
 const getters = {
