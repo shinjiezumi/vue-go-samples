@@ -1,10 +1,12 @@
 package slideshare
 
-type SearchSlideResponse struct {
-	Results []SearchSlideResult `xml:"Slideshow"`
+// SearchResponse 検索結果レスポンス
+type SearchResponse struct {
+	Results []SearchResult `xml:"Slideshow"`
 }
 
-type SearchSlideResult struct {
+// SearchResult 検索結果
+type SearchResult struct {
 	ID                  int           `xml:"ID"`                  // スライドID
 	Title               string        `xml:"Title"`               // タイトル
 	Description         string        `xml:"Description"`         // 概要
@@ -28,4 +30,5 @@ type SearchSlideResult struct {
 	InContest           int           `xml:"InContest"`           //
 }
 
+// ThumbnailSize サムネイルサイズ
 type ThumbnailSize []string

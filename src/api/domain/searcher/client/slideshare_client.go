@@ -42,8 +42,8 @@ func (c *SlideShareClient) Init() {
 	c.hash = hex.EncodeToString(s.Sum(nil))
 }
 
-func (c *SlideShareClient) Search(keyword string, count, page int) (*slideshare.SearchSlideResponse, error) {
-	var ret slideshare.SearchSlideResponse
+func (c *SlideShareClient) Search(keyword string, count, page int) (*slideshare.SearchResponse, error) {
+	var ret slideshare.SearchResponse
 	if keyword == "" {
 		return nil, common.NewApplicationError(http.StatusBadRequest, common.InvalidRequest)
 	}

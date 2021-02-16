@@ -26,8 +26,8 @@ func (c *FeedlyClient) Init() {
 	c.apiToken = os.Getenv("FEEDLY_ACCESS_TOKEN")
 }
 
-func (c *FeedlyClient) Search(keyword string, count, page int) (*feedly.SearchFeedResponse, error) {
-	var result feedly.SearchFeedResponse
+func (c *FeedlyClient) Search(keyword string, count, page int) (*feedly.SearchResponse, error) {
+	var result feedly.SearchResponse
 	if keyword == "" {
 		return nil, common.NewApplicationError(http.StatusBadRequest, common.InvalidRequest)
 	}

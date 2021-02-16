@@ -2,9 +2,11 @@ package qiita
 
 import "time"
 
-type SearchItemResponse []SearchItemResult
+// SearchResponse 検索結果レスポンス
+type SearchResponse []SearchResult
 
-type SearchItemResult struct {
+// SearchResult 検索結果
+type SearchResult struct {
 	RenderedBody   string    `json:"rendered_body"`    // 本文(HTML)
 	Body           string    `json:"body"`             // 本文(Markdown)
 	Coediting      *bool     `json:"coediting"`        // 共同更新かどうか(QiitaTeamのみ有効)
@@ -23,13 +25,16 @@ type SearchItemResult struct {
 	PageViewsCount int       `json:"page_views_count"` // PV数
 }
 
+// Tag タグ
 type Tag struct {
 	Name     string   `json:"name"`
 	Versions []string `json:"versions"`
 }
 
+// Tags タグ一覧
 type Tags []Tag
 
+// GetTags タグ一覧を返す
 func (t *Tags) GetTags() []string {
 	ret := make([]string, 0, len(*t))
 
@@ -40,5 +45,5 @@ func (t *Tags) GetTags() []string {
 	return ret
 }
 
-type User struct {
-}
+// User ユーザー情報(実装割愛)
+type User struct{}

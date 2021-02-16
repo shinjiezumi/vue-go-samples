@@ -5,11 +5,12 @@ import (
 	"net/url"
 )
 
-type SearchFeedResponse struct {
-	Results []SearchFeedResult `json:"results"`
+// SearchResponse 検索結果レスポンス
+type SearchResponse struct {
+	Results []SearchResult `json:"results"`
 }
 
-type SearchFeedResult struct {
+type SearchResult struct {
 	FeedID        string   `json:"feedId"`        // フィードID
 	Subscribers   int      `json:"subscribers"`   // 登録者数
 	Title         string   `json:"title"`         // サイト名
@@ -29,7 +30,7 @@ type SearchFeedResult struct {
 }
 
 // GetSiteURL サイトURLを返す
-func (r *SearchFeedResult) GetSiteURL() string {
+func (r *SearchResult) GetSiteURL() string {
 	if r.Website != nil {
 		return *r.Website
 	}
@@ -38,7 +39,7 @@ func (r *SearchFeedResult) GetSiteURL() string {
 }
 
 // GetDescription サイト概要を返す
-func (r *SearchFeedResult) GetDescription() string {
+func (r *SearchResult) GetDescription() string {
 	if r.Description != nil {
 		return *r.Description
 	}
@@ -47,7 +48,7 @@ func (r *SearchFeedResult) GetDescription() string {
 }
 
 // GetSiteImageURL サイト画像URLを返す
-func (r *SearchFeedResult) GetSiteImageURL() string {
+func (r *SearchResult) GetSiteImageURL() string {
 	if r.VisualURL != nil {
 		return *r.VisualURL
 	}
@@ -56,7 +57,7 @@ func (r *SearchFeedResult) GetSiteImageURL() string {
 }
 
 // GetVelocity 週次投稿数を返す
-func (r *SearchFeedResult) GetVelocity() float32 {
+func (r *SearchResult) GetVelocity() float32 {
 	if r.Velocity != nil {
 		return *r.Velocity
 	}

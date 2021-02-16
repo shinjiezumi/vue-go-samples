@@ -20,7 +20,7 @@ func NewSearchUseCase() *searchUseCase {
 type SearchResponse struct {
 	Feedly     []Feed
 	SlideShare []Slide
-	Qiita      []QiitaItem
+	Qiita      []Qiita
 }
 
 type Feed struct {
@@ -45,7 +45,7 @@ type Slide struct {
 	DownloadCount int
 }
 
-type QiitaItem struct {
+type Qiita struct {
 	ID        string
 	Title     string
 	LikeCount int
@@ -66,7 +66,7 @@ func (s searchUseCase) Execute(q string) SearchResponse {
 	// TODO エラー返す
 	fRes, _ := s.searchFeedly(queries)
 	sRes, _ := s.searchSlide(queries)
-	qRes, _ := s.searchQiitaItem(queries)
+	qRes, _ := s.searchQiita(queries)
 
 	return SearchResponse{
 		Feedly:     fRes,
@@ -77,7 +77,7 @@ func (s searchUseCase) Execute(q string) SearchResponse {
 
 func (s searchUseCase) searchFeedly(queries []string) ([]Feed, error) {
 	lock := sync.Mutex{}
-	var results []feedly.SearchFeedResponse
+	var results []feedly.SearchResponse
 
 	eg, ctx := errgroup.WithContext(context.Background())
 	d := client.NewFeedlyClient()
@@ -118,12 +118,13 @@ func (s searchUseCase) searchFeedly(queries []string) ([]Feed, error) {
 			})
 		}
 	}
+
 	return res, nil
 }
 
 func (s searchUseCase) searchSlide(queries []string) ([]Slide, error) {
 	lock := sync.Mutex{}
-	var results []slideshare.SearchSlideResponse
+	var results []slideshare.SearchResponse
 
 	eg, ctx := errgroup.WithContext(context.Background())
 	c := client.NewSlideShareClient()
@@ -164,12 +165,13 @@ func (s searchUseCase) searchSlide(queries []string) ([]Slide, error) {
 			})
 		}
 	}
+
 	return res, nil
 }
 
-func (s searchUseCase) searchQiitaItem(queries []string) ([]QiitaItem, error) {
+func (s searchUseCase) searchQiita(queries []string) ([]Qiita, error) {
 	lock := sync.Mutex{}
-	var results []qiita.SearchItemResponse
+	var results []qiita.SearchResponse
 
 	eg, ctx := errgroup.WithContext(context.Background())
 	c := client.NewQiitaClient()
@@ -185,7 +187,7 @@ func (s searchUseCase) searchQiitaItem(queries []string) ([]QiitaItem, error) {
 					return err
 				}
 				lock.Lock()
-				results = append(results, res)
+				results = append(results, *res)
 				lock.Unlock()
 				return nil
 			}
@@ -195,10 +197,10 @@ func (s searchUseCase) searchQiitaItem(queries []string) ([]QiitaItem, error) {
 		return nil, err
 	}
 
-	var res []QiitaItem
+	var res []Qiita
 	for _, v := range results {
 		for _, r := range v {
-			res = append(res, QiitaItem{
+			res = append(res, Qiita{
 				ID:        r.ID,
 				Title:     r.Title,
 				LikeCount: r.LikesCount,
@@ -208,5 +210,6 @@ func (s searchUseCase) searchQiitaItem(queries []string) ([]QiitaItem, error) {
 			})
 		}
 	}
+
 	return res, nil
 }

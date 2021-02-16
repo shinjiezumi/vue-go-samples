@@ -26,8 +26,8 @@ func (c *QiitaClient) Init() {
 	c.apiToken = os.Getenv("QIITA_API_TOKEN")
 }
 
-func (c *QiitaClient) Search(keyword string, count, page int) (qiita.SearchItemResponse, error) {
-	var ret qiita.SearchItemResponse
+func (c *QiitaClient) Search(keyword string, count, page int) (*qiita.SearchResponse, error) {
+	var ret qiita.SearchResponse
 	if keyword == "" {
 		return nil, common.NewApplicationError(http.StatusBadRequest, common.InvalidRequest)
 	}
@@ -72,5 +72,5 @@ func (c *QiitaClient) Search(keyword string, count, page int) (qiita.SearchItemR
 		return nil, common.NewApplicationError(http.StatusInternalServerError, common.GeneralError)
 	}
 
-	return ret, nil
+	return &ret, nil
 }
