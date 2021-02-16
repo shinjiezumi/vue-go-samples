@@ -9,6 +9,7 @@ import (
 	"golang.org/x/sync/errgroup"
 	"strings"
 	"sync"
+	"time"
 )
 
 type searchUseCase struct{}
@@ -18,9 +19,28 @@ func NewSearchUseCase() *searchUseCase {
 }
 
 type SearchResponse struct {
-	Feedly     []Feed
-	SlideShare []Slide
-	Qiita      []Qiita
+	Feedly     FeedlyResponse
+	SlideShare SlideShareResponse
+	Qiita      QiitaResponse
+}
+
+type SearchError struct {
+	Message string
+}
+
+type FeedlyResponse struct {
+	List  []Feed
+	Error SearchError
+}
+
+type SlideShareResponse struct {
+	List  []Slide
+	Error SearchError
+}
+
+type QiitaResponse struct {
+	List  []Qiita
+	Error SearchError
 }
 
 type Feed struct {
@@ -56,6 +76,7 @@ type Qiita struct {
 
 const searchCount = 30
 const searchPage = 1
+const searchExpireSecond = 10
 
 func (s searchUseCase) Execute(q string) SearchResponse {
 	queries := strings.Split(q, ",")
@@ -63,10 +84,9 @@ func (s searchUseCase) Execute(q string) SearchResponse {
 		return SearchResponse{}
 	}
 
-	// TODO エラー返す
-	fRes, _ := s.searchFeedly(queries)
-	sRes, _ := s.searchSlide(queries)
-	qRes, _ := s.searchQiita(queries)
+	fRes := s.searchFeedly(queries)
+	sRes := s.searchSlide(queries)
+	qRes := s.searchQiita(queries)
 
 	return SearchResponse{
 		Feedly:     fRes,
@@ -75,13 +95,16 @@ func (s searchUseCase) Execute(q string) SearchResponse {
 	}
 }
 
-func (s searchUseCase) searchFeedly(queries []string) ([]Feed, error) {
-	lock := sync.Mutex{}
-	var results []feedly.SearchResponse
+func (s searchUseCase) searchFeedly(queries []string) FeedlyResponse {
+	pCtx, cancel := context.WithTimeout(context.Background(), searchExpireSecond*time.Second)
+	defer cancel()
+	eg, ctx := errgroup.WithContext(pCtx)
 
-	eg, ctx := errgroup.WithContext(context.Background())
 	d := client.NewFeedlyClient()
 	d.Init()
+
+	lock := sync.Mutex{}
+	var results []feedly.SearchResponse
 	for _, query := range queries {
 		eg.Go(func() error {
 			select {
@@ -100,7 +123,11 @@ func (s searchUseCase) searchFeedly(queries []string) ([]Feed, error) {
 		})
 	}
 	if err := eg.Wait(); err != nil {
-		return nil, err
+		return FeedlyResponse{
+			Error: SearchError{
+				err.Error(),
+			},
+		}
 	}
 
 	var res []Feed
@@ -119,16 +146,21 @@ func (s searchUseCase) searchFeedly(queries []string) ([]Feed, error) {
 		}
 	}
 
-	return res, nil
+	return FeedlyResponse{
+		List: res,
+	}
 }
 
-func (s searchUseCase) searchSlide(queries []string) ([]Slide, error) {
-	lock := sync.Mutex{}
-	var results []slideshare.SearchResponse
+func (s searchUseCase) searchSlide(queries []string) SlideShareResponse {
+	pCtx, cancel := context.WithTimeout(context.Background(), searchExpireSecond*time.Second)
+	defer cancel()
+	eg, ctx := errgroup.WithContext(pCtx)
 
-	eg, ctx := errgroup.WithContext(context.Background())
 	c := client.NewSlideShareClient()
 	c.Init()
+
+	lock := sync.Mutex{}
+	var results []slideshare.SearchResponse
 	for _, query := range queries {
 		eg.Go(func() error {
 			select {
@@ -147,7 +179,11 @@ func (s searchUseCase) searchSlide(queries []string) ([]Slide, error) {
 		})
 	}
 	if err := eg.Wait(); err != nil {
-		return nil, err
+		return SlideShareResponse{
+			Error: SearchError{
+				err.Error(),
+			},
+		}
 	}
 
 	var res []Slide
@@ -166,16 +202,21 @@ func (s searchUseCase) searchSlide(queries []string) ([]Slide, error) {
 		}
 	}
 
-	return res, nil
+	return SlideShareResponse{
+		List: res,
+	}
 }
 
-func (s searchUseCase) searchQiita(queries []string) ([]Qiita, error) {
-	lock := sync.Mutex{}
-	var results []qiita.SearchResponse
+func (s searchUseCase) searchQiita(queries []string) QiitaResponse {
+	pCtx, cancel := context.WithTimeout(context.Background(), searchExpireSecond*time.Second)
+	defer cancel()
+	eg, ctx := errgroup.WithContext(pCtx)
 
-	eg, ctx := errgroup.WithContext(context.Background())
 	c := client.NewQiitaClient()
 	c.Init()
+
+	lock := sync.Mutex{}
+	var results []qiita.SearchResponse
 	for _, query := range queries {
 		eg.Go(func() error {
 			select {
@@ -194,7 +235,11 @@ func (s searchUseCase) searchQiita(queries []string) ([]Qiita, error) {
 		})
 	}
 	if err := eg.Wait(); err != nil {
-		return nil, err
+		return QiitaResponse{
+			Error: SearchError{
+				err.Error(),
+			},
+		}
 	}
 
 	var res []Qiita
@@ -211,5 +256,7 @@ func (s searchUseCase) searchQiita(queries []string) ([]Qiita, error) {
 		}
 	}
 
-	return res, nil
+	return QiitaResponse{
+		List: res,
+	}
 }

@@ -21,7 +21,7 @@
     <div v-else>
       <!--  エラーメッセージ  -->
       <v-row v-if="this.error !== ''" class="text-center" justify="center">
-        <v-alert type="error">{{ this.error }}</v-alert>
+        <v-alert type="error" class="error-text">{{ this.error }}</v-alert>
       </v-row>
       <v-row justify="center">
         <v-col class="mb-3" cols="12" xs="12" sm="8">
@@ -64,6 +64,11 @@ a {
 
 .site-title {
   text-transform: none;
+}
+
+.error-text {
+  white-space: pre-line;
+  text-align: left;
 }
 </style>
 

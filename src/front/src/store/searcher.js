@@ -17,7 +17,9 @@ const getters = {
 
 const mutations = {
   setResult(state, searchResult) {
-    state.searchResult = searchResult
+    state.searchResult.Qiita = searchResult.Qiita.List
+    state.searchResult.SlideShare = searchResult.SlideShare.List
+    state.searchResult.Feedly = searchResult.Feedly.List
   }
 };
 
@@ -30,6 +32,18 @@ const actions = {
     context.commit('loading/setStatus', false, {root: true});
     if (response.status === STATUS_OK) {
       context.commit('setResult', response.data);
+
+      // エラーがあれば表示
+      let errorMessages = []
+      for (let v of ['Qiita', 'SlideShare', 'Feedly']) {
+        if (response.data[v].Error.Message !== '') {
+          errorMessages.push(v + ':' + response.data[v].Error.Message)
+        }
+      }
+      if (errorMessages.length > 0) {
+        context.commit('error/setError', {message: errorMessages.join("\n")}, {root: true});
+      }
+
       return
     }
 
