@@ -9,8 +9,6 @@
           <v-list-item-title class="title" v-text="item.Title"></v-list-item-title>
           <!-- PV+LGTM数} -->
           <div class="reaction-container">
-            <v-icon color="teal">mdi-eye</v-icon>
-            <span class="pv-count">{{ item.PVCount }}</span>
             <v-icon color="teal">mdi-thumb-up</v-icon>
             <span class="like-count">{{ item.LikeCount }}</span>
           </div>
@@ -60,7 +58,7 @@ export default {
   height: 1rem;
 }
 
-.tag, .pv-count, .like-count {
+.tag, .like-count {
   padding: .2rem;
 }
 

@@ -71,7 +71,6 @@ type Qiita struct {
 	LikeCount int
 	Tags      []string
 	URL       string
-	PVCount   int
 }
 
 const searchCount = 30
@@ -83,10 +82,25 @@ func (s searchUseCase) Execute(q string) SearchResponse {
 	if len(queries) == 0 {
 		return SearchResponse{}
 	}
+	var fRes FeedlyResponse
+	var sRes SlideShareResponse
+	var qRes QiitaResponse
 
-	fRes := s.searchFeedly(queries)
-	sRes := s.searchSlide(queries)
-	qRes := s.searchQiita(queries)
+	var wg sync.WaitGroup
+	wg.Add(3)
+	go func() {
+		fRes = s.searchFeedly(queries)
+		wg.Done()
+	}()
+	go func() {
+		sRes = s.searchSlide(queries)
+		wg.Done()
+	}()
+	go func() {
+		qRes = s.searchQiita(queries)
+		wg.Done()
+	}()
+	wg.Wait()
 
 	return SearchResponse{
 		Feedly:     fRes,
@@ -251,7 +265,6 @@ func (s searchUseCase) searchQiita(queries []string) QiitaResponse {
 				LikeCount: r.LikesCount,
 				Tags:      r.Tags.GetTags(),
 				URL:       r.URL,
-				PVCount:   r.PageViewsCount,
 			})
 		}
 	}
