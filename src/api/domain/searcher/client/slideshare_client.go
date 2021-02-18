@@ -57,7 +57,7 @@ func (c *SlideShareClient) Search(keyword string, count, page int) (*slideshare.
 
 	// クエリ生成
 	q := u.Query()
-	q.Set("q", url.QueryEscape(keyword))
+	q.Set("q", keyword)
 	q.Set("page", strconv.Itoa(page))
 	q.Set("items_per_page", strconv.Itoa(count))
 	q = c.addCommonQuery(q)

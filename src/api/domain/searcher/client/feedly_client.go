@@ -41,7 +41,7 @@ func (c *FeedlyClient) Search(keyword string, count, page int) (*feedly.SearchRe
 
 	// クエリ生成
 	q := u.Query()
-	q.Set("query", url.QueryEscape(keyword))
+	q.Set("query", keyword)
 	q.Set("page", strconv.Itoa(page))
 	q.Set("page", strconv.Itoa(count))
 	q.Set("locale", "ja")
