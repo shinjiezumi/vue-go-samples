@@ -13,7 +13,7 @@ services:
       - ./src/api:/go/src
     environment:
       TZ: Asia/Tokyo
-    command: gin -i -p 8080 run
+#    command: gin -i -p 8080 run
     tty:
       true
   front:
@@ -26,7 +26,7 @@ services:
       - 8080:8080
     volumes:
       - ./src/front:/app
-    command: npm run serve
+#    command: npm run serve
     stdin_open: true
     tty: true
   db:
