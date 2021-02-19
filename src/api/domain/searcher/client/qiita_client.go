@@ -12,64 +12,97 @@ import (
 	"strconv"
 )
 
+const searchQiitaCount = 80
+const searchQiitaPage = 1
+
+// IQiitaClient QiitaAPIClientインターフェース
+type IQiitaClient interface {
+	Init()
+	Search(keyword string) (*qiita.SearchResponse, error)
+}
+
+// QiitaClient QiitaAPIClient
 type QiitaClient struct {
 	endpoint string
 	apiToken string
 }
 
-func NewQiitaClient() *QiitaClient {
+// NewQiitaClient APIClientを生成する
+func NewQiitaClient() IQiitaClient {
 	return &QiitaClient{}
 }
 
+// Init APIClientを初期化する
 func (c *QiitaClient) Init() {
 	c.endpoint = "https://qiita.com/api/v2"
 	c.apiToken = os.Getenv("QIITA_API_TOKEN")
 }
 
-func (c *QiitaClient) Search(keyword string, count, page int) (*qiita.SearchResponse, error) {
-	var ret qiita.SearchResponse
+// Search Qiita記事を検索する
+func (c *QiitaClient) Search(keyword string) (*qiita.SearchResponse, error) {
 	if keyword == "" {
-		return nil, common.NewApplicationError(http.StatusBadRequest, common.InvalidRequest)
+		return nil, common.NewApplicationError(http.StatusBadRequest, common.InvalidRequest, nil)
 	}
 
 	// URL生成
+	u, err := c.makeURL(keyword)
+	if err != nil {
+		return nil, common.NewApplicationError(http.StatusInternalServerError, common.GeneralError, err)
+	}
+
+	// 検索実行
+	req, err := http.NewRequest(http.MethodGet, u.String(), nil)
+	if err != nil {
+		return nil, common.NewApplicationError(http.StatusInternalServerError, common.GeneralError, err)
+	}
+	req.Header.Set("Authorization", "Bearer "+c.apiToken)
+	hc := new(http.Client)
+	res, err := hc.Do(req)
+	if err != nil {
+		return nil, common.NewApplicationError(http.StatusInternalServerError, common.GeneralError, err)
+	}
+
+	// レスポンス生成
+	ret, err := c.makeResponse(res)
+	if err != nil {
+		return nil, common.NewApplicationError(http.StatusInternalServerError, common.GeneralError, err)
+	}
+
+	return ret, nil
+}
+
+func (c *QiitaClient) makeURL(keyword string) (*url.URL, error) {
+	// URL生成
 	u, err := url.Parse(c.endpoint)
 	if err != nil {
-		return nil, common.NewApplicationError(http.StatusInternalServerError, common.GeneralError)
+		return nil, err
 	}
 	u.Path = path.Join(u.Path, "items")
 
 	// クエリ生成
 	q := u.Query()
 	q.Set("query", keyword)
-	q.Set("page", strconv.Itoa(page))
-	q.Set("per_page", strconv.Itoa(count))
+	q.Set("page", strconv.Itoa(searchQiitaPage))
+	q.Set("per_page", strconv.Itoa(searchQiitaCount))
 	u.RawQuery = q.Encode()
 
-	// 検索実行
-	req, err := http.NewRequest(http.MethodGet, u.String(), nil)
-	if err != nil {
-		return nil, common.NewApplicationError(http.StatusInternalServerError, common.GeneralError)
-	}
-	req.Header.Set("Authorization", "Bearer "+c.apiToken)
-	hc := new(http.Client)
-	res, err := hc.Do(req)
-	if err != nil {
-		return nil, common.NewApplicationError(http.StatusInternalServerError, common.GeneralError)
-	}
+	return u, nil
+}
+
+func (c *QiitaClient) makeResponse(res *http.Response) (*qiita.SearchResponse, error) {
 	defer func() {
 		if err := res.Body.Close(); err != nil {
 			panic(err)
 		}
 	}()
-
 	body, err := ioutil.ReadAll(res.Body)
 	if err != nil {
-		return nil, common.NewApplicationError(http.StatusInternalServerError, common.GeneralError)
+		return nil, err
 	}
 
+	var ret qiita.SearchResponse
 	if err := json.Unmarshal(body, &ret); err != nil {
-		return nil, common.NewApplicationError(http.StatusInternalServerError, common.GeneralError)
+		return nil, err
 	}
 
 	return &ret, nil

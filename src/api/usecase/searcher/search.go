@@ -73,9 +73,7 @@ type Qiita struct {
 	URL       string
 }
 
-const searchCount = 30
-const searchPage = 1
-const searchExpireSecond = 10
+const searchExpirySecond = 10
 
 func (s searchUseCase) Execute(q string) SearchResponse {
 	queries := strings.Split(q, ",")
@@ -110,7 +108,7 @@ func (s searchUseCase) Execute(q string) SearchResponse {
 }
 
 func (s searchUseCase) searchFeedly(queries []string) FeedlyResponse {
-	pCtx, cancel := context.WithTimeout(context.Background(), searchExpireSecond*time.Second)
+	pCtx, cancel := context.WithTimeout(context.Background(), searchExpirySecond*time.Second)
 	defer cancel()
 	eg, ctx := errgroup.WithContext(pCtx)
 
@@ -125,7 +123,7 @@ func (s searchUseCase) searchFeedly(queries []string) FeedlyResponse {
 			case <-ctx.Done():
 				return nil
 			default:
-				res, err := d.Search(query, searchCount, searchPage)
+				res, err := d.Search(query)
 				if err != nil {
 					return err
 				}
@@ -166,7 +164,7 @@ func (s searchUseCase) searchFeedly(queries []string) FeedlyResponse {
 }
 
 func (s searchUseCase) searchSlide(queries []string) SlideShareResponse {
-	pCtx, cancel := context.WithTimeout(context.Background(), searchExpireSecond*time.Second)
+	pCtx, cancel := context.WithTimeout(context.Background(), searchExpirySecond*time.Second)
 	defer cancel()
 	eg, ctx := errgroup.WithContext(pCtx)
 
@@ -181,7 +179,7 @@ func (s searchUseCase) searchSlide(queries []string) SlideShareResponse {
 			case <-ctx.Done():
 				return nil
 			default:
-				res, err := c.Search(query, searchCount, searchPage)
+				res, err := c.Search(query)
 				if err != nil {
 					return err
 				}
@@ -222,7 +220,7 @@ func (s searchUseCase) searchSlide(queries []string) SlideShareResponse {
 }
 
 func (s searchUseCase) searchQiita(queries []string) QiitaResponse {
-	pCtx, cancel := context.WithTimeout(context.Background(), searchExpireSecond*time.Second)
+	pCtx, cancel := context.WithTimeout(context.Background(), searchExpirySecond*time.Second)
 	defer cancel()
 	eg, ctx := errgroup.WithContext(pCtx)
 
@@ -237,7 +235,7 @@ func (s searchUseCase) searchQiita(queries []string) QiitaResponse {
 			case <-ctx.Done():
 				return nil
 			default:
-				res, err := c.Search(query, searchCount, searchPage)
+				res, err := c.Search(query)
 				if err != nil {
 					return err
 				}

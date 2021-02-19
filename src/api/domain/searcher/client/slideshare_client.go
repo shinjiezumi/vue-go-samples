@@ -17,6 +17,16 @@ import (
 	"time"
 )
 
+const searchSlideCount = 50
+const searchSlidePage = 1
+
+// ISlideShareClient ISlideShareClientインターフェース
+type ISlideShareClient interface {
+	Init()
+	Search(keyword string) (*slideshare.SearchResponse, error)
+}
+
+// SlideShareClient SlideShareClient
 type SlideShareClient struct {
 	endpoint string
 	apikey   string
@@ -24,10 +34,12 @@ type SlideShareClient struct {
 	hash     string
 }
 
-func NewSlideShareClient() *SlideShareClient {
+// NewSlideShareClient APIClientを生成する
+func NewSlideShareClient() ISlideShareClient {
 	return &SlideShareClient{}
 }
 
+// Init APIClientを初期化する
 func (c *SlideShareClient) Init() {
 	c.endpoint = "https://www.slideshare.net/api/2"
 	// @see https://www.slideshare.net/developers/documentation
@@ -42,36 +54,27 @@ func (c *SlideShareClient) Init() {
 	c.hash = hex.EncodeToString(s.Sum(nil))
 }
 
-func (c *SlideShareClient) Search(keyword string, count, page int) (*slideshare.SearchResponse, error) {
-	var ret slideshare.SearchResponse
+// Search スライドを検索する
+func (c *SlideShareClient) Search(keyword string) (*slideshare.SearchResponse, error) {
 	if keyword == "" {
-		return nil, common.NewApplicationError(http.StatusBadRequest, common.InvalidRequest)
+		return nil, common.NewApplicationError(http.StatusBadRequest, common.InvalidRequest, nil)
 	}
 
 	// URL生成
-	u, err := url.Parse(c.endpoint)
+	u, err := c.makeURL(keyword)
 	if err != nil {
-		return nil, common.NewApplicationError(http.StatusInternalServerError, common.GeneralError)
+		return nil, common.NewApplicationError(http.StatusInternalServerError, common.GeneralError, err)
 	}
-	u.Path = path.Join(u.Path, "search_slideshows")
-
-	// クエリ生成
-	q := u.Query()
-	q.Set("q", keyword)
-	q.Set("page", strconv.Itoa(page))
-	q.Set("items_per_page", strconv.Itoa(count))
-	q = c.addCommonQuery(q)
-	u.RawQuery = q.Encode()
 
 	// 検索実行
 	req, err := http.NewRequest(http.MethodGet, u.String(), nil)
 	if err != nil {
-		return nil, common.NewApplicationError(http.StatusInternalServerError, common.GeneralError)
+		return nil, common.NewApplicationError(http.StatusInternalServerError, common.GeneralError, err)
 	}
 	hc := new(http.Client)
 	res, err := hc.Do(req)
 	if err != nil {
-		return nil, common.NewApplicationError(http.StatusInternalServerError, common.GeneralError)
+		return nil, common.NewApplicationError(http.StatusInternalServerError, common.GeneralError, err)
 	}
 	defer func() {
 		if err := res.Body.Close(); err != nil {
@@ -79,25 +82,51 @@ func (c *SlideShareClient) Search(keyword string, count, page int) (*slideshare.
 		}
 	}()
 
-	body, err := ioutil.ReadAll(res.Body)
+	ret, err := c.makeResponse(res)
 	if err != nil {
-		return nil, common.NewApplicationError(http.StatusInternalServerError, common.GeneralError)
+		return nil, common.NewApplicationError(http.StatusInternalServerError, common.GeneralError, err)
 	}
 
-	err = xml.Unmarshal(body, &ret)
-	if err != nil {
-		return nil, common.NewApplicationError(http.StatusInternalServerError, common.GeneralError)
-	}
-
-	return &ret, nil
+	return ret, nil
 }
 
 func (c *SlideShareClient) addCommonQuery(q url.Values) url.Values {
-	// 認証情報設定
 	q.Set("api_key", c.apikey)
 	q.Set("ts", strconv.FormatInt(c.ts, 10))
 	q.Set("hash", c.hash)
 	q.Set("lang", "ja")
 
 	return q
+}
+
+func (c *SlideShareClient) makeURL(keyword string) (*url.URL, error) {
+	u, err := url.Parse(c.endpoint)
+	if err != nil {
+		return nil, err
+	}
+	u.Path = path.Join(u.Path, "search_slideshows")
+
+	q := u.Query()
+	q.Set("q", keyword)
+	q.Set("page", strconv.Itoa(searchSlidePage))
+	q.Set("items_per_page", strconv.Itoa(searchSlideCount))
+	q = c.addCommonQuery(q)
+	u.RawQuery = q.Encode()
+
+	return u, nil
+}
+
+func (c *SlideShareClient) makeResponse(res *http.Response) (*slideshare.SearchResponse, error) {
+	body, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		return nil, common.NewApplicationError(http.StatusInternalServerError, common.GeneralError, err)
+	}
+
+	var ret slideshare.SearchResponse
+	err = xml.Unmarshal(body, &ret)
+	if err != nil {
+		return nil, common.NewApplicationError(http.StatusInternalServerError, common.GeneralError, err)
+	}
+
+	return &ret, nil
 }
