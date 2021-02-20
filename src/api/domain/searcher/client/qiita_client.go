@@ -18,7 +18,7 @@ const searchQiitaPage = 1
 // IQiitaClient QiitaAPIClientインターフェース
 type IQiitaClient interface {
 	Init()
-	Search(keyword string) (*qiita.SearchResponse, error)
+	Search(keyword string) (*qiita.SearchResults, error)
 }
 
 // QiitaClient QiitaAPIClient
@@ -39,7 +39,7 @@ func (c *QiitaClient) Init() {
 }
 
 // Search Qiita記事を検索する
-func (c *QiitaClient) Search(keyword string) (*qiita.SearchResponse, error) {
+func (c *QiitaClient) Search(keyword string) (*qiita.SearchResults, error) {
 	if keyword == "" {
 		return nil, common.NewApplicationError(http.StatusBadRequest, common.InvalidRequest, nil)
 	}
@@ -89,7 +89,7 @@ func (c *QiitaClient) makeURL(keyword string) (*url.URL, error) {
 	return u, nil
 }
 
-func (c *QiitaClient) makeResponse(res *http.Response) (*qiita.SearchResponse, error) {
+func (c *QiitaClient) makeResponse(res *http.Response) (*qiita.SearchResults, error) {
 	defer func() {
 		if err := res.Body.Close(); err != nil {
 			panic(err)
@@ -100,7 +100,7 @@ func (c *QiitaClient) makeResponse(res *http.Response) (*qiita.SearchResponse, e
 		return nil, err
 	}
 
-	var ret qiita.SearchResponse
+	var ret qiita.SearchResults
 	if err := json.Unmarshal(body, &ret); err != nil {
 		return nil, err
 	}

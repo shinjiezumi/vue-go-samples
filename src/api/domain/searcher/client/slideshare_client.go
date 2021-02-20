@@ -23,7 +23,7 @@ const searchSlidePage = 1
 // ISlideShareClient ISlideShareClientインターフェース
 type ISlideShareClient interface {
 	Init()
-	Search(keyword string) (*slideshare.SearchResponse, error)
+	Search(keyword string) (*slideshare.SearchResults, error)
 }
 
 // SlideShareClient SlideShareClient
@@ -55,7 +55,7 @@ func (c *SlideShareClient) Init() {
 }
 
 // Search スライドを検索する
-func (c *SlideShareClient) Search(keyword string) (*slideshare.SearchResponse, error) {
+func (c *SlideShareClient) Search(keyword string) (*slideshare.SearchResults, error) {
 	if keyword == "" {
 		return nil, common.NewApplicationError(http.StatusBadRequest, common.InvalidRequest, nil)
 	}
@@ -116,17 +116,19 @@ func (c *SlideShareClient) makeURL(keyword string) (*url.URL, error) {
 	return u, nil
 }
 
-func (c *SlideShareClient) makeResponse(res *http.Response) (*slideshare.SearchResponse, error) {
+func (c *SlideShareClient) makeResponse(res *http.Response) (*slideshare.SearchResults, error) {
 	body, err := ioutil.ReadAll(res.Body)
 	if err != nil {
 		return nil, common.NewApplicationError(http.StatusInternalServerError, common.GeneralError, err)
 	}
 
-	var ret slideshare.SearchResponse
-	err = xml.Unmarshal(body, &ret)
+	var w slideshare.SearchResponseWrapper
+	err = xml.Unmarshal(body, &w)
 	if err != nil {
 		return nil, common.NewApplicationError(http.StatusInternalServerError, common.GeneralError, err)
 	}
+
+	ret := w.GetSearchResults()
 
 	return &ret, nil
 }

@@ -2,8 +2,8 @@ package qiita
 
 import "time"
 
-// SearchResponse 検索結果レスポンス
-type SearchResponse []SearchResult
+// SearchResults 検索結果一覧
+type SearchResults []SearchResult
 
 // SearchResult 検索結果
 type SearchResult struct {
@@ -21,8 +21,8 @@ type SearchResult struct {
 	Title          string    `json:"title"`            // タイトル
 	UpdatedAt      time.Time `json:"updated_at"`       // 更新日時
 	URL            string    `json:"url"`              // URL
-	User           User      `json:"-"`                // ユーザー数
-	PageViewsCount int       `json:"page_views_count"` // PV数
+	User           User      `json:"-"`                // ユーザー情報 ※割愛
+	PageViewsCount int       `json:"page_views_count"` // PV数 ※死んでるよう
 }
 
 // Tag タグ

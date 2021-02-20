@@ -5,14 +5,24 @@ import (
 	"net/url"
 )
 
-// SearchResponse 検索結果レスポンス
-type SearchResponse struct {
-	Results []SearchResult `json:"results"`
+// SearchResponseWrapper 検索結果ラッパー
+type SearchResponseWrapper struct {
+	Results SearchResults `json:"results"`
 }
 
+// GetSearchResults 検索結果一覧を返す
+func (w *SearchResponseWrapper) GetSearchResults() SearchResults {
+	return w.Results
+}
+
+// SearchResults 検索結果一覧
+type SearchResults []SearchResult
+
+// SearchResult 検索結果
 type SearchResult struct {
 	FeedID        string   `json:"feedId"`        // フィードID
 	Subscribers   int      `json:"subscribers"`   // 登録者数
+	Score         float32  `json:"score"`         // スコア
 	Title         string   `json:"title"`         // サイト名
 	Description   *string  `json:"description"`   // サイト概要
 	Website       *string  `json:"website"`       // ウェブサイトURL

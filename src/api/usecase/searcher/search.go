@@ -80,23 +80,23 @@ func (s searchUseCase) Execute(q string) SearchResponse {
 	if len(queries) == 0 {
 		return SearchResponse{}
 	}
+
 	var fRes FeedlyResponse
 	var sRes SlideShareResponse
 	var qRes QiitaResponse
-
 	var wg sync.WaitGroup
 	wg.Add(3)
 	go func() {
+		defer wg.Done()
 		fRes = s.searchFeedly(queries)
-		wg.Done()
 	}()
 	go func() {
+		defer wg.Done()
 		sRes = s.searchSlide(queries)
-		wg.Done()
 	}()
 	go func() {
+		defer wg.Done()
 		qRes = s.searchQiita(queries)
-		wg.Done()
 	}()
 	wg.Wait()
 
@@ -108,27 +108,31 @@ func (s searchUseCase) Execute(q string) SearchResponse {
 }
 
 func (s searchUseCase) searchFeedly(queries []string) FeedlyResponse {
+	// コンテキスト設定
 	pCtx, cancel := context.WithTimeout(context.Background(), searchExpirySecond*time.Second)
 	defer cancel()
 	eg, ctx := errgroup.WithContext(pCtx)
 
+	// client生成
 	d := client.NewFeedlyClient()
 	d.Init()
 
+	// 検索
 	lock := sync.Mutex{}
-	var results []feedly.SearchResponse
+	var results feedly.SearchResults
 	for _, query := range queries {
+		q := query
 		eg.Go(func() error {
 			select {
 			case <-ctx.Done():
 				return nil
 			default:
-				res, err := d.Search(query)
+				res, err := d.Search(q)
 				if err != nil {
 					return err
 				}
 				lock.Lock()
-				results = append(results, *res)
+				results = append(results, *res...)
 				lock.Unlock()
 				return nil
 			}
@@ -142,20 +146,21 @@ func (s searchUseCase) searchFeedly(queries []string) FeedlyResponse {
 		}
 	}
 
+	// ソート
+	sorted := feedly.Sort(results)
+
 	var res []Feed
-	for _, v := range results {
-		for _, r := range v.Results {
-			res = append(res, Feed{
-				ID:          r.FeedID,
-				Title:       r.Title,
-				Description: r.GetDescription(),
-				URL:         r.GetSiteURL(),
-				Subscribers: r.Subscribers,
-				Velocity:    r.GetVelocity(),
-				ImageURL:    r.GetSiteImageURL(),
-				Tags:        r.DeliciousTags,
-			})
-		}
+	for _, r := range sorted {
+		res = append(res, Feed{
+			ID:          r.FeedID,
+			Title:       r.Title,
+			Description: r.GetDescription(),
+			URL:         r.GetSiteURL(),
+			Subscribers: r.Subscribers,
+			Velocity:    r.GetVelocity(),
+			ImageURL:    r.GetSiteImageURL(),
+			Tags:        r.DeliciousTags,
+		})
 	}
 
 	return FeedlyResponse{
@@ -164,27 +169,31 @@ func (s searchUseCase) searchFeedly(queries []string) FeedlyResponse {
 }
 
 func (s searchUseCase) searchSlide(queries []string) SlideShareResponse {
+	// コンテキスト設定
 	pCtx, cancel := context.WithTimeout(context.Background(), searchExpirySecond*time.Second)
 	defer cancel()
 	eg, ctx := errgroup.WithContext(pCtx)
 
+	// client生成
 	c := client.NewSlideShareClient()
 	c.Init()
 
+	// 検索
 	lock := sync.Mutex{}
-	var results []slideshare.SearchResponse
+	var results slideshare.SearchResults
 	for _, query := range queries {
+		q := query
 		eg.Go(func() error {
 			select {
 			case <-ctx.Done():
 				return nil
 			default:
-				res, err := c.Search(query)
+				res, err := c.Search(q)
 				if err != nil {
 					return err
 				}
 				lock.Lock()
-				results = append(results, *res)
+				results = append(results, *res...)
 				lock.Unlock()
 				return nil
 			}
@@ -198,20 +207,20 @@ func (s searchUseCase) searchSlide(queries []string) SlideShareResponse {
 		}
 	}
 
+	sorted := slideshare.Sort(results)
+
 	var res []Slide
-	for _, v := range results {
-		for _, r := range v.Results {
-			res = append(res, Slide{
-				ID:            r.ID,
-				Title:         r.Title,
-				Description:   r.Description,
-				URL:           r.URL,
-				ImageURL:      r.ThumbnailURL,
-				EmbedURL:      r.Embed,
-				DownloadURL:   r.DownloadURL,
-				DownloadCount: r.Download,
-			})
-		}
+	for _, r := range sorted {
+		res = append(res, Slide{
+			ID:            r.ID,
+			Title:         r.Title,
+			Description:   r.Description,
+			URL:           r.URL,
+			ImageURL:      r.ThumbnailURL,
+			EmbedURL:      r.Embed,
+			DownloadURL:   r.DownloadURL,
+			DownloadCount: r.Download,
+		})
 	}
 
 	return SlideShareResponse{
@@ -220,27 +229,31 @@ func (s searchUseCase) searchSlide(queries []string) SlideShareResponse {
 }
 
 func (s searchUseCase) searchQiita(queries []string) QiitaResponse {
+	// コンテキスト設定
 	pCtx, cancel := context.WithTimeout(context.Background(), searchExpirySecond*time.Second)
 	defer cancel()
 	eg, ctx := errgroup.WithContext(pCtx)
 
+	//  client生成
 	c := client.NewQiitaClient()
 	c.Init()
 
+	// 検索
 	lock := sync.Mutex{}
-	var results []qiita.SearchResponse
+	var results qiita.SearchResults
 	for _, query := range queries {
+		q := query
 		eg.Go(func() error {
 			select {
 			case <-ctx.Done():
 				return nil
 			default:
-				res, err := c.Search(query)
+				res, err := c.Search(q)
 				if err != nil {
 					return err
 				}
 				lock.Lock()
-				results = append(results, *res)
+				results = append(results, *res...)
 				lock.Unlock()
 				return nil
 			}
@@ -254,17 +267,18 @@ func (s searchUseCase) searchQiita(queries []string) QiitaResponse {
 		}
 	}
 
+	// ソート
+	sorted := qiita.Sort(results)
+
 	var res []Qiita
-	for _, v := range results {
-		for _, r := range v {
-			res = append(res, Qiita{
-				ID:        r.ID,
-				Title:     r.Title,
-				LikeCount: r.LikesCount,
-				Tags:      r.Tags.GetTags(),
-				URL:       r.URL,
-			})
-		}
+	for _, r := range sorted {
+		res = append(res, Qiita{
+			ID:        r.ID,
+			Title:     r.Title,
+			LikeCount: r.LikesCount,
+			Tags:      r.Tags.GetTags(),
+			URL:       r.URL,
+		})
 	}
 
 	return QiitaResponse{

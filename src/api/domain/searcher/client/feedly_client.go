@@ -17,7 +17,7 @@ const searchFeedCount = 100
 // IFeedlyClient FeedlyClientインターフェース
 type IFeedlyClient interface {
 	Init()
-	Search(keyword string) (*feedly.SearchResponse, error)
+	Search(keyword string) (*feedly.SearchResults, error)
 }
 
 // FeedlyClient FeedlyClient
@@ -38,7 +38,7 @@ func (c *FeedlyClient) Init() {
 }
 
 // Search フィードを検索する
-func (c *FeedlyClient) Search(keyword string) (*feedly.SearchResponse, error) {
+func (c *FeedlyClient) Search(keyword string) (*feedly.SearchResults, error) {
 	if keyword == "" {
 		return nil, common.NewApplicationError(http.StatusBadRequest, common.InvalidRequest, nil)
 	}
@@ -94,7 +94,7 @@ func (c *FeedlyClient) makeURL(keyword string) (*url.URL, error) {
 	return u, nil
 }
 
-func (c *FeedlyClient) makeResponse(res *http.Response) (*feedly.SearchResponse, error) {
+func (c *FeedlyClient) makeResponse(res *http.Response) (*feedly.SearchResults, error) {
 	defer func() {
 		if err := res.Body.Close(); err != nil {
 			panic(err)
@@ -105,10 +105,11 @@ func (c *FeedlyClient) makeResponse(res *http.Response) (*feedly.SearchResponse,
 		return nil, err
 	}
 
-	var ret feedly.SearchResponse
-	if err := json.Unmarshal(body, &ret); err != nil {
+	var w feedly.SearchResponseWrapper
+	if err := json.Unmarshal(body, &w); err != nil {
 		return nil, err
 	}
 
+	ret := w.GetSearchResults()
 	return &ret, nil
 }
