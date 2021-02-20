@@ -1,6 +1,9 @@
 package qiita
 
-import "time"
+import (
+	"github.com/shinjiezumi/vue-go-samples/src/api/common"
+	"time"
+)
 
 // SearchResults 検索結果一覧
 type SearchResults []SearchResult
@@ -21,8 +24,29 @@ type SearchResult struct {
 	Title          string    `json:"title"`            // タイトル
 	UpdatedAt      time.Time `json:"updated_at"`       // 更新日時
 	URL            string    `json:"url"`              // URL
-	User           User      `json:"-"`                // ユーザー情報 ※割愛
+	User           User      `json:"user"`             // ユーザー情報
 	PageViewsCount int       `json:"page_views_count"` // PV数 ※死んでるよう
+}
+
+// GetTags タグ一覧を返す
+func (r *SearchResult) GetTags() []string {
+	ret := make([]string, 0, len(r.Tags))
+
+	for _, v := range r.Tags {
+		ret = append(ret, v.Name)
+	}
+
+	return ret
+}
+
+// GetCreatedDate 作成日を返す
+func (r *SearchResult) GetCreatedDate() string {
+	return r.CreatedAt.Format(common.DateFormat4Show)
+}
+
+// GetProfileImageURL プロフィール画像URLを返す
+func (r *SearchResult) GetProfileImageURL() string {
+	return r.User.ProfileImageURL
 }
 
 // Tag タグ
@@ -34,16 +58,22 @@ type Tag struct {
 // Tags タグ一覧
 type Tags []Tag
 
-// GetTags タグ一覧を返す
-func (t *Tags) GetTags() []string {
-	ret := make([]string, 0, len(*t))
-
-	for _, v := range *t {
-		ret = append(ret, v.Name)
-	}
-
-	return ret
+// User ユーザー情報
+type User struct {
+	Description       string `json:"description"`       // 自己紹介
+	FacebookID        string `json:"facebook_id"`       // FacebookID
+	FolloweesCount    int    `json:"followees_count"`   // フォロー数
+	FollowersCount    int    `json:"followers_count"`   // フォロワー数,
+	GithubLoginName   string `json:"github_login_name"` // GitHubログイン名
+	ID                string `json:"id"`                // ユーザーID
+	ItemsCount        int    `json:"items_count"`       // 投稿数,
+	LinkedinID        string `json:"Linkedin_id"`       //LinkedinID,
+	Location          string `json:"location"`          // ロケーション
+	Name              string `json:"name"`              // 名前
+	Organization      string `json:"organization"`      // 所属
+	PermanentID       int    `json:"permanent_id"`
+	ProfileImageURL   string `json:"profile_image_url"`   // プロフィール画像URL
+	TeamOnly          bool   `json:"team_only"`           //
+	TwitterScreenName string `json:"twitter_screen_name"` // ツイッターアカウント名
+	WebsiteURL        string `json:"website_url"`         // ウェブサイトURL
 }
-
-// User ユーザー情報(実装割愛)
-type User struct{}

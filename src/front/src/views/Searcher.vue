@@ -39,7 +39,6 @@
             </v-tab>
           </v-tabs>
           <!--  検索結果  -->
-          <!--  タブ  -->
           <v-tabs-items v-model="tabs">
             <v-tab-item :key="'Qiita'" :value="'mobile-tabs-5-Qiita'">
               <QiitaList :items="searchResult.Qiita"></QiitaList>

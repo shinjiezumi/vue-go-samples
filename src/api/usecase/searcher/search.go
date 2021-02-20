@@ -66,11 +66,14 @@ type Slide struct {
 }
 
 type Qiita struct {
-	ID        string
-	Title     string
-	LikeCount int
-	Tags      []string
-	URL       string
+	ID              string
+	Title           string
+	LikeCount       int
+	Tags            []string
+	URL             string
+	Created         string
+	UserID          string
+	ProfileImageURL string
 }
 
 const searchExpirySecond = 10
@@ -273,11 +276,14 @@ func (s searchUseCase) searchQiita(queries []string) QiitaResponse {
 	var res []Qiita
 	for _, r := range sorted {
 		res = append(res, Qiita{
-			ID:        r.ID,
-			Title:     r.Title,
-			LikeCount: r.LikesCount,
-			Tags:      r.Tags.GetTags(),
-			URL:       r.URL,
+			ID:              r.ID,
+			Title:           r.Title,
+			LikeCount:       r.LikesCount,
+			Tags:            r.GetTags(),
+			URL:             r.URL,
+			Created:         r.GetCreatedDate(),
+			UserID:          r.User.ID,
+			ProfileImageURL: r.GetProfileImageURL(),
 		})
 	}
 
