@@ -1,20 +1,37 @@
 <template>
   <v-content>
-    <v-row class="text-center mt-5" align="center" justify="center">
-      <v-col class="mb-4" cols="12" sm="8">
-        <v-btn to="/todos" text class="text-none">TodoList</v-btn>
+    <v-row class="text-center mt-5 pa-3" align="center" justify="center">
+      <v-col class="mb-4" cols="12" sm="4">
+        <IntroduceAppCard
+            app-title="TodoList"
+            app-sub-title="シンプルなTodoアプリ"
+            app-path="/todos"
+            app-image="/img/TodoList.png"
+        />
+      </v-col>
+      <v-col class="mb-4" cols="12" sm="4">
+        <IntroduceAppCard
+            app-title="Searcher"
+            app-sub-title="複数サイトのコンテンツを検索するアプリ"
+            app-path="/searcher"
+            app-image="/img/Searcher.png"
+        />
       </v-col>
     </v-row>
   </v-content>
 </template>
 
 <script>
-  import { generateTitle } from "@/util";
+import { generateTitle } from "@/util";
+import IntroduceAppCard from "../components/IntroduceAppCard.vue"
 
-  export default {
-    title: generateTitle('トップページ'),
-    name: "Top"
+export default {
+  name: "Top",
+  title: generateTitle('トップページ'),
+  components: {
+    IntroduceAppCard
   }
+}
 </script>
 
 <style scoped>

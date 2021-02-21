@@ -13,6 +13,8 @@ COPY ./src/api /go/src
 RUN go build -o go \
     && go get -u github.com/codegangsta/gin
 
+ENV LANG=en_US.UTF-8
+
 ENV DBMS="mysql" \
     USER="root" \
     PASS="root" \

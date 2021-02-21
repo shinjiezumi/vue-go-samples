@@ -1,18 +1,19 @@
 package todo
 
 import (
-	"github.com/gin-gonic/gin"
-	"github.com/gin-gonic/gin/binding"
-	"github.com/go-playground/validator/v10"
-	"github.com/shinjiezumi/vue-go-samples/src/api/auth"
-	"github.com/shinjiezumi/vue-go-samples/src/api/common"
-	"github.com/shinjiezumi/vue-go-samples/src/api/database"
-	"github.com/shinjiezumi/vue-go-samples/src/api/messages"
-	"github.com/shinjiezumi/vue-go-samples/src/api/models/todo"
 	"net/http"
 	"regexp"
 	"strconv"
 	"time"
+
+	"github.com/gin-gonic/gin"
+	"github.com/gin-gonic/gin/binding"
+	"github.com/go-playground/validator/v10"
+
+	"vgs/auth"
+	"vgs/common"
+	"vgs/database"
+	"vgs/models/todo"
 )
 
 type todoRequest struct {
@@ -68,7 +69,7 @@ func Create(c *gin.Context) {
 	v := validator.New()
 	_ = v.RegisterValidation("limitDate", validateLimitDate)
 	if err := v.Struct(r); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"message": messages.ExtractValidationErrorMsg(err)})
+		c.JSON(http.StatusBadRequest, gin.H{"message": common.ExtractValidationErrorMsg(err)})
 		return
 	}
 
@@ -82,7 +83,7 @@ func Create(c *gin.Context) {
 	todo.NewRepository(database.Conn).Create(&t)
 
 	c.JSON(http.StatusOK, gin.H{
-		"message": messages.Stored,
+		"message": common.Stored,
 	})
 }
 
@@ -102,7 +103,7 @@ func Update(c *gin.Context) {
 	v := validator.New()
 	_ = v.RegisterValidation("limitDate", validateLimitDate)
 	if err := v.Struct(r); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"message": messages.ExtractValidationErrorMsg(err)})
+		c.JSON(http.StatusBadRequest, gin.H{"message": common.ExtractValidationErrorMsg(err)})
 		return
 	}
 
@@ -110,12 +111,12 @@ func Update(c *gin.Context) {
 	t := repo.GetById(id)
 	if t == nil {
 		c.JSON(http.StatusNotFound, gin.H{
-			"message": messages.NotFound,
+			"message": common.NotFound,
 		})
 		return
 	} else if auth.GetLoginUser(c).Id != t.UserId {
 		c.JSON(http.StatusForbidden, gin.H{
-			"message": messages.Forbidden,
+			"message": common.Forbidden,
 		})
 		return
 	}
@@ -128,7 +129,7 @@ func Update(c *gin.Context) {
 	repo.Save(t)
 
 	c.JSON(200, gin.H{
-		"message": messages.Modified,
+		"message": common.Modified,
 	})
 }
 
@@ -144,12 +145,12 @@ func Delete(c *gin.Context) {
 	t := repo.GetById(id)
 	if t == nil {
 		c.JSON(http.StatusNotFound, gin.H{
-			"message": messages.NotFound,
+			"message": common.NotFound,
 		})
 		return
 	} else if auth.GetLoginUser(c).Id != t.UserId {
 		c.JSON(http.StatusForbidden, gin.H{
-			"message": messages.Forbidden,
+			"message": common.Forbidden,
 		})
 		return
 	}
@@ -157,7 +158,7 @@ func Delete(c *gin.Context) {
 	repo.Delete(t.Id)
 
 	c.JSON(200, gin.H{
-		"message": messages.Deleted,
+		"message": common.Deleted,
 	})
 }
 
@@ -173,12 +174,12 @@ func Finished(c *gin.Context) {
 	t := repo.GetById(id)
 	if t == nil {
 		c.JSON(http.StatusNotFound, gin.H{
-			"message": messages.NotFound,
+			"message": common.NotFound,
 		})
 		return
 	} else if auth.GetLoginUser(c).Id != t.UserId {
 		c.JSON(http.StatusForbidden, gin.H{
-			"message": messages.Forbidden,
+			"message": common.Forbidden,
 		})
 		return
 	}
@@ -187,7 +188,7 @@ func Finished(c *gin.Context) {
 	repo.Save(t)
 
 	c.JSON(200, gin.H{
-		"message": messages.Modified,
+		"message": common.Modified,
 	})
 }
 
@@ -203,12 +204,12 @@ func UnFinished(c *gin.Context) {
 	t := repo.GetById(id)
 	if t == nil {
 		c.JSON(http.StatusNotFound, gin.H{
-			"message": messages.NotFound,
+			"message": common.NotFound,
 		})
 		return
 	} else if auth.GetLoginUser(c).Id != t.UserId {
 		c.JSON(http.StatusForbidden, gin.H{
-			"message": messages.Forbidden,
+			"message": common.Forbidden,
 		})
 		return
 	}
@@ -217,7 +218,7 @@ func UnFinished(c *gin.Context) {
 	repo.Save(t)
 
 	c.JSON(200, gin.H{
-		"message": messages.Modified,
+		"message": common.Modified,
 	})
 }
 

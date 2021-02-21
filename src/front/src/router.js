@@ -6,6 +6,7 @@ import Login from "./views/auth/Login";
 import Register from "./views/auth/Register";
 import Top from "./views/Top";
 import Todo from "./views/Todo"
+import Searcher from "./views/Searcher.vue"
 import store from "./store"
 
 Vue.use(Router);
@@ -49,6 +50,10 @@ export default new Router({
           next()
         }
       }
+    },
+    {
+      path: '/searcher',
+      component: Searcher,
     },
     {
       path: '/hello',

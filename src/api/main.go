@@ -1,17 +1,25 @@
 package main
 
 import (
-	"github.com/gin-contrib/cors"
-	"github.com/gin-gonic/gin"
-	"github.com/shinjiezumi/vue-go-samples/src/api/auth"
-	"github.com/shinjiezumi/vue-go-samples/src/api/database"
-	"github.com/shinjiezumi/vue-go-samples/src/api/todo"
 	"log"
 	"net/http"
 	"os"
+	"vgs/auth"
+	"vgs/database"
+	"vgs/searcher"
+	"vgs/todo"
+
+	"github.com/gin-contrib/cors"
+	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
 )
 
 func main() {
+	if gin.Mode() == gin.DebugMode {
+		if err := godotenv.Load(".env"); err != nil {
+			panic(err)
+		}
+	}
 	database.Initialize()
 
 	router := gin.Default()
@@ -37,6 +45,7 @@ func main() {
 		api.POST("/login", auth.Login)
 		api.GET("/refresh_token", auth.RefreshToken)
 		api.POST("/register", auth.Register)
+		searcher.SetupRoute(api)
 
 		api.Use(auth.MiddlewareFunc())
 		{

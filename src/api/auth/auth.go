@@ -2,18 +2,19 @@ package auth
 
 import (
 	"fmt"
-	"github.com/appleboy/gin-jwt/v2"
-	"github.com/gin-gonic/gin"
-	"github.com/gin-gonic/gin/binding"
-	"github.com/go-playground/validator/v10"
-	"github.com/shinjiezumi/vue-go-samples/src/api/common"
-	"github.com/shinjiezumi/vue-go-samples/src/api/database"
-	"github.com/shinjiezumi/vue-go-samples/src/api/messages"
-	"github.com/shinjiezumi/vue-go-samples/src/api/models/user"
 	"log"
 	"net/http"
 	"os"
 	"time"
+
+	jwt "github.com/appleboy/gin-jwt/v2"
+	"github.com/gin-gonic/gin"
+	"github.com/gin-gonic/gin/binding"
+	"github.com/go-playground/validator/v10"
+
+	"vgs/common"
+	"vgs/database"
+	"vgs/models/user"
 )
 
 var secretKey = os.Getenv("JWT_SECRET_KEY")
@@ -39,7 +40,7 @@ func Register(c *gin.Context) {
 
 	v := validator.New()
 	if err := v.Struct(r); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"message": messages.ExtractValidationErrorMsg(err)})
+		c.JSON(http.StatusBadRequest, gin.H{"message": common.ExtractValidationErrorMsg(err)})
 		return
 	}
 
@@ -47,7 +48,7 @@ func Register(c *gin.Context) {
 	u := repo.GetUserByEmail(r.Email)
 	if u != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
-			"message": messages.EmailAlreadyExists,
+			"message": common.EmailAlreadyExists,
 		})
 		return
 	}
@@ -72,7 +73,7 @@ func Login(c *gin.Context) {
 
 	v := validator.New()
 	if err := v.Struct(r); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"message": messages.ExtractValidationErrorMsg(err)})
+		c.JSON(http.StatusBadRequest, gin.H{"message": common.ExtractValidationErrorMsg(err)})
 		return
 	}
 
@@ -156,7 +157,8 @@ func createAuthMiddleware() (*jwt.GinJWTMiddleware, error) {
 				}, nil
 			}
 
-			return "", fmt.Errorf(messages.InvalidEmailOrPassword)
+			// TODO リファクタ対象
+			return "", fmt.Errorf(common.InvalidEmailOrPassword.String())
 		},
 		Unauthorized: func(c *gin.Context, code int, message string) {
 			c.JSON(code, gin.H{

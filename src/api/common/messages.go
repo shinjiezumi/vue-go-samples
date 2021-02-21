@@ -1,21 +1,27 @@
-package messages
+package common
 
 import (
 	"fmt"
 	"github.com/go-playground/validator/v10"
 )
 
-const Stored = "保存しました"
-const Modified = "更新しました"
-const Deleted = "削除しました"
-const NotFound = "存在しません"
-const Forbidden = "権限がありません"
-const EmailAlreadyExists = "このメールアドレスでは登録できません"
-const GeneralError = "エラーが発生しました"
+type Message string
 
-const (
-	InvalidEmailOrPassword = "メールアドレス、またはパスワードが一致しません"
+var (
+	Stored                 Message = "保存しました"
+	Modified               Message = "更新しました"
+	Deleted                Message = "削除しました"
+	NotFound               Message = "存在しません"
+	Forbidden              Message = "権限がありません"
+	EmailAlreadyExists     Message = "このメールアドレスでは登録できません"
+	InvalidEmailOrPassword Message = "メールアドレス、またはパスワードが一致しません"
+	InvalidRequest         Message = "リクエストが不正です"
+	GeneralError           Message = "エラーが発生しました"
 )
+
+func (m Message) String() string {
+	return string(m)
+}
 
 // ExtractValidationErrorMsg はバリデーションエラーからエラーメッセージを抽出します
 func ExtractValidationErrorMsg(err error) string {

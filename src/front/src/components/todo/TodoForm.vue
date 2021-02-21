@@ -1,7 +1,7 @@
 <template>
   <v-dialog v-model="dialog" persistent max-width="600px">
     <template v-slot:activator="{ on }">
-      <v-row v-if="isNew" class="text-center" align="center" justify="center">
+      <v-row v-if="isNew" class="createBtn text-center" align="center" justify="center">
         <v-col class="mb-4" cols="12" sm="8">
           <v-btn class="mx-2" fab dark v-on="on" color="primary">
             <v-icon dark>mdi-plus</v-icon>
@@ -64,32 +64,32 @@
 </template>
 
 <script>
-  import { validationMixin } from 'vuelidate'
-  import moment from "moment"
-  import { formatDate, parseDate } from "@/util";
-  import { maxLength, required } from "vuelidate/lib/validators";
+import { validationMixin } from 'vuelidate'
+import moment from "moment"
+import { formatDate, parseDate } from "@/util";
+import { maxLength, required } from "vuelidate/lib/validators";
 
-  export default {
-    name: "TodoForm",
-    mixins: [validationMixin],
-    props: {
-      isNew: {
-        type: Boolean,
-        default: false,
-      },
-      todoId: {
-        type: Number,
-        default: 0,
-      },
-      todoTitle: {
-        type: String,
-        default: '',
-      },
-      todoMemo: {
-        type: String,
-        default: '',
-      },
-      todoLimitDate: {
+export default {
+  name: "TodoForm",
+  mixins: [validationMixin],
+  props: {
+    isNew: {
+      type: Boolean,
+      default: false,
+    },
+    todoId: {
+      type: Number,
+      default: 0,
+    },
+    todoTitle: {
+      type: String,
+      default: '',
+    },
+    todoMemo: {
+      type: String,
+      default: '',
+    },
+    todoLimitDate: {
         type: String,
         default: moment().format("YYYY-MM-DD"),
       },
@@ -190,4 +190,7 @@
 </script>
 
 <style scoped>
+.createBtn {
+  margin-top: .5rem;
+}
 </style>
