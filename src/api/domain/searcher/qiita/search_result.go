@@ -1,8 +1,8 @@
 package qiita
 
 import (
-	"github.com/shinjiezumi/vue-go-samples/src/api/common"
 	"time"
+	"vgs/common"
 )
 
 // SearchResults 検索結果一覧

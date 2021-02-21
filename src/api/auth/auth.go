@@ -2,17 +2,19 @@ package auth
 
 import (
 	"fmt"
-	"github.com/appleboy/gin-jwt/v2"
-	"github.com/gin-gonic/gin"
-	"github.com/gin-gonic/gin/binding"
-	"github.com/go-playground/validator/v10"
-	"github.com/shinjiezumi/vue-go-samples/src/api/common"
-	"github.com/shinjiezumi/vue-go-samples/src/api/database"
-	"github.com/shinjiezumi/vue-go-samples/src/api/models/user"
 	"log"
 	"net/http"
 	"os"
 	"time"
+
+	jwt "github.com/appleboy/gin-jwt/v2"
+	"github.com/gin-gonic/gin"
+	"github.com/gin-gonic/gin/binding"
+	"github.com/go-playground/validator/v10"
+
+	"vgs/common"
+	"vgs/database"
+	"vgs/models/user"
 )
 
 var secretKey = os.Getenv("JWT_SECRET_KEY")

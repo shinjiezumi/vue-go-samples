@@ -4,8 +4,6 @@ import (
 	"crypto/sha1"
 	"encoding/hex"
 	"encoding/xml"
-	"github.com/shinjiezumi/vue-go-samples/src/api/common"
-	"github.com/shinjiezumi/vue-go-samples/src/api/domain/searcher/slideshare"
 	"io"
 	"io/ioutil"
 	"log"
@@ -15,6 +13,9 @@ import (
 	"path"
 	"strconv"
 	"time"
+
+	"vgs/common"
+	"vgs/domain/searcher/slideshare"
 )
 
 const searchSlideCount = 50

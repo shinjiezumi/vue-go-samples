@@ -1,16 +1,17 @@
 package main
 
 import (
-	"github.com/gin-contrib/cors"
-	"github.com/gin-gonic/gin"
-	"github.com/joho/godotenv"
-	"github.com/shinjiezumi/vue-go-samples/src/api/auth"
-	"github.com/shinjiezumi/vue-go-samples/src/api/database"
-	"github.com/shinjiezumi/vue-go-samples/src/api/searcher"
-	"github.com/shinjiezumi/vue-go-samples/src/api/todo"
 	"log"
 	"net/http"
 	"os"
+	"vgs/auth"
+	"vgs/database"
+	"vgs/searcher"
+	"vgs/todo"
+
+	"github.com/gin-contrib/cors"
+	"github.com/gin-gonic/gin"
+	"github.com/joho/godotenv"
 )
 
 func main() {

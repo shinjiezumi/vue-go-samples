@@ -2,14 +2,15 @@ package client
 
 import (
 	"encoding/json"
-	"github.com/shinjiezumi/vue-go-samples/src/api/common"
-	"github.com/shinjiezumi/vue-go-samples/src/api/domain/searcher/qiita"
 	"io/ioutil"
 	"net/http"
 	"net/url"
 	"os"
 	"path"
 	"strconv"
+
+	"vgs/common"
+	"vgs/domain/searcher/qiita"
 )
 
 const searchQiitaCount = 80

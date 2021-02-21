@@ -1,9 +1,10 @@
 package user
 
 import (
+	"vgs/common"
+
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jinzhu/gorm"
-	"github.com/shinjiezumi/vue-go-samples/src/api/common"
 )
 
 type Repository struct {

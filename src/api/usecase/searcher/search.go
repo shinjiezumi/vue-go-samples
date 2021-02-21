@@ -2,14 +2,16 @@ package searcher
 
 import (
 	"context"
-	"github.com/shinjiezumi/vue-go-samples/src/api/domain/searcher/client"
-	"github.com/shinjiezumi/vue-go-samples/src/api/domain/searcher/feedly"
-	"github.com/shinjiezumi/vue-go-samples/src/api/domain/searcher/qiita"
-	"github.com/shinjiezumi/vue-go-samples/src/api/domain/searcher/slideshare"
-	"golang.org/x/sync/errgroup"
 	"strings"
 	"sync"
 	"time"
+
+	"golang.org/x/sync/errgroup"
+
+	"vgs/domain/searcher/client"
+	"vgs/domain/searcher/feedly"
+	"vgs/domain/searcher/qiita"
+	"vgs/domain/searcher/slideshare"
 )
 
 type searchUseCase struct{}
@@ -78,8 +80,8 @@ type Qiita struct {
 
 const searchExpirySecond = 10
 
-func (s searchUseCase) Execute(q string) SearchResponse {
-	queries := strings.Split(q, ",")
+func (s *searchUseCase) Execute(q string) SearchResponse {
+	queries := s.parseQuery(q)
 	if len(queries) == 0 {
 		return SearchResponse{}
 	}
@@ -110,7 +112,28 @@ func (s searchUseCase) Execute(q string) SearchResponse {
 	}
 }
 
-func (s searchUseCase) searchFeedly(queries []string) FeedlyResponse {
+func (s *searchUseCase) parseQuery(q string) []string {
+	qMap := map[string]struct{}{}
+	tmp := strings.Split(q, ",")
+	for _, v := range tmp {
+		if v == "" {
+			continue
+		}
+		if _, found := qMap[v]; found {
+			continue
+		}
+		qMap[v] = struct{}{}
+	}
+
+	queries := make([]string, 0, len(qMap))
+	for k := range qMap {
+		queries = append(queries, k)
+	}
+
+	return queries
+}
+
+func (s *searchUseCase) searchFeedly(queries []string) FeedlyResponse {
 	// コンテキスト設定
 	pCtx, cancel := context.WithTimeout(context.Background(), searchExpirySecond*time.Second)
 	defer cancel()
@@ -171,7 +194,7 @@ func (s searchUseCase) searchFeedly(queries []string) FeedlyResponse {
 	}
 }
 
-func (s searchUseCase) searchSlide(queries []string) SlideShareResponse {
+func (s *searchUseCase) searchSlide(queries []string) SlideShareResponse {
 	// コンテキスト設定
 	pCtx, cancel := context.WithTimeout(context.Background(), searchExpirySecond*time.Second)
 	defer cancel()
@@ -231,7 +254,7 @@ func (s searchUseCase) searchSlide(queries []string) SlideShareResponse {
 	}
 }
 
-func (s searchUseCase) searchQiita(queries []string) QiitaResponse {
+func (s *searchUseCase) searchQiita(queries []string) QiitaResponse {
 	// コンテキスト設定
 	pCtx, cancel := context.WithTimeout(context.Background(), searchExpirySecond*time.Second)
 	defer cancel()
