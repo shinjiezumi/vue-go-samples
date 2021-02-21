@@ -10,10 +10,10 @@ import (
 	"github.com/gin-gonic/gin/binding"
 	"github.com/go-playground/validator/v10"
 
-	"vgs/auth"
-	"vgs/common"
-	"vgs/database"
-	"vgs/models/todo"
+	"github.com/shinjiezumi/vue-go-samples/src/api/auth"
+	"github.com/shinjiezumi/vue-go-samples/src/api/common"
+	"github.com/shinjiezumi/vue-go-samples/src/api/database"
+	"github.com/shinjiezumi/vue-go-samples/src/api/models/todo"
 )
 
 type todoRequest struct {

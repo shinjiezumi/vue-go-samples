@@ -9,8 +9,8 @@ import (
 	"path"
 	"strconv"
 
-	"vgs/common"
-	"vgs/domain/searcher/qiita"
+	"github.com/shinjiezumi/vue-go-samples/src/api/common"
+	"github.com/shinjiezumi/vue-go-samples/src/api/domain/searcher/qiita"
 )
 
 const searchQiitaCount = 80

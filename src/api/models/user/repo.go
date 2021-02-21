@@ -1,7 +1,7 @@
 package user
 
 import (
-	"vgs/common"
+	"github.com/shinjiezumi/vue-go-samples/src/api/common"
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/jinzhu/gorm"

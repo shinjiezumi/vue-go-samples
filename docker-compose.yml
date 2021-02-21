@@ -41,12 +41,12 @@ services:
       MYSQL_DATABASE: sample
       MYSQL_ROOT_PASSWORD: root
       TZ: Asia/Tokyo
-  docs:
-    build:
-      context: .
-      dockerfile: docker/docs/Dockerfile
-    ports:
-      - 3000:3000
-    volumes:
-      - ./src/api/docs:/docs
-    command: aglio -i /docs/api.md -s -h 0.0.0.0
+#  docs:
+#    build:
+#      context: .
+#      dockerfile: docker/docs/Dockerfile
+#    ports:
+#      - 3000:3000
+#    volumes:
+#      - ./src/api/docs:/docs
+#    command: aglio -i /docs/api.md -s -h 0.0.0.0
