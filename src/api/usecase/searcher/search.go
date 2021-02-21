@@ -51,7 +51,6 @@ type Feed struct {
 	Description string
 	URL         string
 	Subscribers int
-	Velocity    float32
 	ImageURL    string
 	Tags        []string
 }
@@ -183,7 +182,6 @@ func (s *searchUseCase) searchFeedly(queries []string) FeedlyResponse {
 			Description: r.GetDescription(),
 			URL:         r.GetSiteURL(),
 			Subscribers: r.Subscribers,
-			Velocity:    r.GetVelocity(),
 			ImageURL:    r.GetSiteImageURL(),
 			Tags:        r.DeliciousTags,
 		})
