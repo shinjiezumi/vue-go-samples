@@ -8,10 +8,10 @@ import (
 
 	"golang.org/x/sync/errgroup"
 
-	"vgs/domain/searcher/client"
-	"vgs/domain/searcher/feedly"
-	"vgs/domain/searcher/qiita"
-	"vgs/domain/searcher/slideshare"
+	"github.com/shinjiezumi/vue-go-samples/src/api/domain/searcher/client"
+	"github.com/shinjiezumi/vue-go-samples/src/api/domain/searcher/feedly"
+	"github.com/shinjiezumi/vue-go-samples/src/api/domain/searcher/qiita"
+	"github.com/shinjiezumi/vue-go-samples/src/api/domain/searcher/slideshare"
 )
 
 type searchUseCase struct{}

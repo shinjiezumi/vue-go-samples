@@ -14,8 +14,8 @@ import (
 	"strconv"
 	"time"
 
-	"vgs/common"
-	"vgs/domain/searcher/slideshare"
+	"github.com/shinjiezumi/vue-go-samples/src/api/common"
+	"github.com/shinjiezumi/vue-go-samples/src/api/domain/searcher/slideshare"
 )
 
 const searchSlideCount = 50
