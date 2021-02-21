@@ -21,8 +21,7 @@
           <div class="Item__Tags">
             <v-icon color="teal">mdi-tag</v-icon>
             <span v-for="(tag, i) in item.Tags" :key="tag" class="Item__Tag">
-              {{ tag }}
-              <span v-if="i !== (item.Tags.length - 1)">,</span>
+              {{ tag }}<template v-if="i !== (item.Tags.length - 1)">,</template>
             </span>
           </div>
           <!-- LGTM数 -->
@@ -72,6 +71,7 @@ export default {
 .Item__Tags, .Item__Reaction {
   display: flex;
   margin-top: .5rem;
+  word-break: keep-all;
 }
 
 .Item__Reaction {

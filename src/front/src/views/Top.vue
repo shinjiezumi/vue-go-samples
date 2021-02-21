@@ -14,7 +14,7 @@
             app-title="Searcher"
             app-sub-title="複数サイトのコンテンツを検索するアプリ"
             app-path="/searcher"
-            app-image="https://placehold.jp/300x250.png"
+            app-image="/img/Searcher.png"
         />
       </v-col>
     </v-row>

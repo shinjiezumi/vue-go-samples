@@ -1,6 +1,6 @@
 <template>
-  <v-card class="mx-auto" elevation="5">
-    <v-img :src="appImage" height="400px" />
+  <v-card class="mx-auto" elevation="5" outlined>
+    <v-img :src="appImage" width="100%" height="100%"/>
     <v-card-title>{{ appTitle }}</v-card-title>
     <v-card-subtitle class="appSubTitle">{{ appSubTitle }}</v-card-subtitle>
     <v-card-actions>
