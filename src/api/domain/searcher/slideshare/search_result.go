@@ -41,10 +41,7 @@ type SearchResult struct {
 }
 
 func (r *SearchResult) GetUpdated() time.Time {
-	t, err := time.Parse("2006-01-02 15:04:05 UTC", r.Updated)
-	if err != nil {
-		panic(err)
-	}
+	t, _ := time.Parse("2006-01-02 15:04:05 UTC", r.Updated)
 
 	return t
 }

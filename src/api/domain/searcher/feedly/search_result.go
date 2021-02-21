@@ -63,14 +63,5 @@ func (r *SearchResult) GetSiteImageURL() string {
 		return *r.VisualURL
 	}
 
-	return fmt.Sprintf("https://placehold.jp/{%d}x{%d}.png", 150, 150) + url.QueryEscape("?text=NO IMAGE")
-}
-
-// GetVelocity 週次投稿数を返す
-func (r *SearchResult) GetVelocity() float32 {
-	if r.Velocity != nil {
-		return *r.Velocity
-	}
-
-	return 0.0
+	return fmt.Sprintf("https://placehold.jp/%dx%d.png?text=%s", 150, 150, url.QueryEscape("NO IMAGE"))
 }

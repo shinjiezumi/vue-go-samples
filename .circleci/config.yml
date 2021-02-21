@@ -23,7 +23,7 @@ jobs:
       - run:
           name: run tests
           working_directory: src/api
-          command: go test
+          command: go test -race -v -cover ./...
   api-build_push_image_cloud_run_mangaged:
     docker:
       - image: 'cimg/base:stable'
