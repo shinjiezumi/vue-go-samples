@@ -2,6 +2,7 @@ package searcher
 
 import (
 	"reflect"
+	"sort"
 	"testing"
 )
 
@@ -29,9 +30,9 @@ func Test_searchUseCase_parseQuery(t *testing.T) {
 				q: "hoge,fuga,hogehoge",
 			},
 			want: []string{
+				"hogehoge",
 				"hoge",
 				"fuga",
-				"hogehoge",
 			},
 		},
 		{
@@ -55,7 +56,12 @@ func Test_searchUseCase_parseQuery(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			s := &searchUseCase{}
-			if got := s.parseQuery(tt.args.q); !reflect.DeepEqual(got, tt.want) {
+			got := s.parseQuery(tt.args.q)
+			// 順不同なので雑にソート
+			sort.SliceStable(got, func(i, j int) bool {
+				return got[i] > got[j]
+			})
+			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("parseQuery() = %v, want %v", got, tt.want)
 			}
 		})
