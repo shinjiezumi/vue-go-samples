@@ -56,14 +56,13 @@ type Feed struct {
 }
 
 type Slide struct {
-	ID            int
-	Title         string
-	Description   string
-	URL           string
-	ImageURL      string
-	EmbedURL      string
-	DownloadURL   string
-	DownloadCount int
+	ID          int
+	Title       string
+	Description string
+	URL         string
+	ImageURL    string
+	EmbedURL    string
+	DownloadURL string
 }
 
 type Qiita struct {
@@ -236,14 +235,13 @@ func (s *searchUseCase) searchSlide(queries []string) SlideShareResponse {
 	var res []Slide
 	for _, r := range sorted {
 		res = append(res, Slide{
-			ID:            r.ID,
-			Title:         r.Title,
-			Description:   r.Description,
-			URL:           r.URL,
-			ImageURL:      r.ThumbnailURL,
-			EmbedURL:      r.Embed,
-			DownloadURL:   r.DownloadURL,
-			DownloadCount: r.Download,
+			ID:          r.ID,
+			Title:       r.Title,
+			Description: r.Description,
+			URL:         r.URL,
+			ImageURL:    r.ThumbnailURL,
+			EmbedURL:    r.Embed,
+			DownloadURL: r.DownloadURL,
 		})
 	}
 

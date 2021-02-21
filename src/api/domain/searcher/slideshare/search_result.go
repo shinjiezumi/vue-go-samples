@@ -32,7 +32,7 @@ type SearchResult struct {
 	Updated             string        `xml:"Updated"`             // 更新日時
 	Language            string        `xml:"Language"`            // 言語
 	Format              string        `xml:"Format"`              // フォーマット
-	Download            int           `xml:"Download"`            // ダウンロード数
+	Download            bool          `xml:"Download"`            // ダウンロード可能フラグ
 	DownloadURL         string        `xml:"DownloadURL"`         // ダウンロードURL
 	SecretKey           string        `xml:"SecretKey"`           // シークレット
 	SlideshowEmbedURL   string        `xml:"SlideshowEmbedURL"`   // スライドショー埋め込みRUL

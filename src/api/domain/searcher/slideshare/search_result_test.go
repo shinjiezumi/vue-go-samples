@@ -63,7 +63,7 @@ func TestSearchResult_GetUpdated(t *testing.T) {
 		Updated             string
 		Language            string
 		Format              string
-		Download            int
+		Download            bool
 		DownloadURL         string
 		SecretKey           string
 		SlideshowEmbedURL   string
