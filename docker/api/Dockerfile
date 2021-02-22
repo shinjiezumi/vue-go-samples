@@ -11,7 +11,8 @@ WORKDIR /go/src
 COPY ./src/api /go/src
 
 RUN go build -o go \
-    && go get -u github.com/codegangsta/gin
+    && go get -u github.com/codegangsta/gin \
+    && go get github.com/rubenv/sql-migrate/...
 
 ENV LANG=en_US.UTF-8
 

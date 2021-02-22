@@ -39,14 +39,17 @@ goroutine/channelを使った複数Webサービスを横断した検索アプリ
 $ git clone https://github.com/shinjiezumi/vue-go-samples.git
 $ cd vue-go-samples
 $ docker-compose up -d
-$ docker-compose exec api sql-migrate up
+$ docker-compose exec api bash
+$ sql-migrate up
+$ cp .env.example .env // Secretなどを設定
 $ docker-compose exec front npm install
 ```
 
 ## サーバー起動
+
 ```
-$ docker-compose exec api gin -i -p 8080 run
-$ docker-compose exec front npm run serve
+$ bash scripts/start-api.sh
+$ bash scripts/start-front.sh
 ```
 
 http://localhost:8080 開く
