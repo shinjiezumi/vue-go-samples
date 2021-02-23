@@ -4,7 +4,7 @@ import (
 	"github.com/shinjiezumi/vue-go-samples/src/api/common"
 	"github.com/shinjiezumi/vue-go-samples/src/api/database"
 	"github.com/shinjiezumi/vue-go-samples/src/api/domain/todo"
-	"github.com/shinjiezumi/vue-go-samples/src/api/models/user"
+	"github.com/shinjiezumi/vue-go-samples/src/api/domain/user"
 )
 
 type TodoResponse struct {

@@ -42,16 +42,13 @@ func main() {
 				"message": "Vue Go Samples",
 			})
 		})
-
-		api.POST("/login", auth.Login)
-		api.GET("/refresh_token", auth.RefreshToken)
-		api.POST("/register", auth.Register)
-
+		auth.SetupRoute(api)
 		searcher.SetupRoute(api)
 
+		// 認証必要なエンドポイント
 		api.Use(auth.MiddlewareFunc())
 		{
-			api.GET("/user", auth.CurrentUser)
+			auth.SetupAuthenticatedRoute(api)
 			todo_list.SetupRoute(api)
 		}
 	}
