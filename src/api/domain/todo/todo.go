@@ -21,7 +21,7 @@ func (t *Todo) Finished(date time.Time) {
 	t.FinishedAt = &date
 }
 
-// Finished はTodoを未完了にします
+// UnFinished はTodoを未完了にします
 func (t *Todo) UnFinished() {
 	t.FinishedAt = nil
 }

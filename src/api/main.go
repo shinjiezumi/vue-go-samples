@@ -12,7 +12,7 @@ import (
 	"github.com/shinjiezumi/vue-go-samples/src/api/auth"
 	"github.com/shinjiezumi/vue-go-samples/src/api/database"
 	"github.com/shinjiezumi/vue-go-samples/src/api/searcher"
-	"github.com/shinjiezumi/vue-go-samples/src/api/todo"
+	"github.com/shinjiezumi/vue-go-samples/src/api/todo_list"
 )
 
 func main() {
@@ -46,18 +46,13 @@ func main() {
 		api.POST("/login", auth.Login)
 		api.GET("/refresh_token", auth.RefreshToken)
 		api.POST("/register", auth.Register)
+
 		searcher.SetupRoute(api)
 
 		api.Use(auth.MiddlewareFunc())
 		{
 			api.GET("/user", auth.CurrentUser)
-
-			api.POST("/todos", todo.Create)
-			api.GET("/todos", todo.GetList)
-			api.PUT("/todos/:id", todo.Update)
-			api.DELETE("/todos/:id", todo.Delete)
-			api.PUT("/todos/:id/finished", todo.Finished)
-			api.PUT("/todos/:id/unfinished", todo.UnFinished)
+			todo_list.SetupRoute(api)
 		}
 	}
 
