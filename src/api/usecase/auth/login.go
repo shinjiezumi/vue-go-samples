@@ -14,70 +14,31 @@ import (
 
 	"github.com/shinjiezumi/vue-go-samples/src/api/common"
 	"github.com/shinjiezumi/vue-go-samples/src/api/database"
-	"github.com/shinjiezumi/vue-go-samples/src/api/models/user"
+	"github.com/shinjiezumi/vue-go-samples/src/api/domain/user"
 )
 
+var identityKey = "name"
 var secretKey = os.Getenv("JWT_SECRET_KEY")
 
-type loginRequest struct {
+type LoginRequest struct {
 	Email    string `json:"email" validate:"required,email,lte=255"`
 	Password string `json:"password" validate:"required,gte=8,lte=16"`
 }
 
-type registerRequest struct {
-	Name string `json:"name" validate:"required,lte=255"`
-	loginRequest
+type loginUseCase struct{}
+
+func NewLoginUseCase() *loginUseCase {
+	return &loginUseCase{}
 }
 
-var IdentityKey = "name"
-
-func Register(c *gin.Context) {
-	var r registerRequest
-	if err := c.ShouldBindBodyWith(&r, binding.JSON); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
-		return
-	}
-
+func (s *loginUseCase) Execute(c *gin.Context, r LoginRequest) {
 	v := validator.New()
 	if err := v.Struct(r); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"message": common.ExtractValidationErrorMsg(err)})
 		return
 	}
 
-	repo := user.NewRepository(database.Conn)
-	u := repo.GetUserByEmail(r.Email)
-	if u != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"message": common.EmailAlreadyExists,
-		})
-		return
-	}
-
-	u = &user.User{
-		Name:     r.Name,
-		Email:    r.Email,
-		Password: common.HashPassword(r.Password),
-	}
-	user.NewRepository(database.Conn).Create(u)
-
-	// JWTトークン発行
-	Login(c)
-}
-
-func Login(c *gin.Context) {
-	var r loginRequest
-	if err := c.ShouldBindBodyWith(&r, binding.JSON); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"message": err.Error()})
-		return
-	}
-
-	v := validator.New()
-	if err := v.Struct(r); err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"message": common.ExtractValidationErrorMsg(err)})
-		return
-	}
-
-	authMiddleware, err := createAuthMiddleware()
+	authMiddleware, err := CreateAuthMiddleware()
 	if err != nil {
 		log.Fatal("JWT Error:" + err.Error())
 	}
@@ -85,53 +46,19 @@ func Login(c *gin.Context) {
 	authMiddleware.LoginHandler(c)
 }
 
-func CurrentUser(c *gin.Context) {
-	u := GetLoginUser(c)
-	c.JSON(http.StatusOK, gin.H{
-		"name": u.Name,
-	})
-}
-
-func RefreshToken(c *gin.Context) {
-	authMiddleware, err := createAuthMiddleware()
-	if err != nil {
-		log.Fatal("JWT Error:" + err.Error())
-	}
-
-	authMiddleware.RefreshHandler(c)
-}
-
-func MiddlewareFunc() gin.HandlerFunc {
-	authMiddleware, err := createAuthMiddleware()
-	if err != nil {
-		log.Fatal("JWT Error:" + err.Error())
-	}
-
-	return authMiddleware.MiddlewareFunc()
-}
-
-func GetLoginUser(c *gin.Context) *user.User {
-	authMiddleware, err := createAuthMiddleware()
-	if err != nil {
-		log.Fatal("JWT Error:" + err.Error())
-	}
-
-	return authMiddleware.IdentityHandler(c).(*user.User)
-}
-
-func createAuthMiddleware() (*jwt.GinJWTMiddleware, error) {
+func CreateAuthMiddleware() (*jwt.GinJWTMiddleware, error) {
 	// the jwt middleware
 	authMiddleware, err := jwt.New(&jwt.GinJWTMiddleware{
 		Realm:       "test zone",
 		Key:         []byte(secretKey),
 		Timeout:     time.Hour,
 		MaxRefresh:  time.Hour,
-		IdentityKey: IdentityKey,
+		IdentityKey: identityKey,
 		PayloadFunc: func(data interface{}) jwt.MapClaims {
 			if v, ok := data.(*user.User); ok {
 				return jwt.MapClaims{
 					"id":        v.Id,
-					IdentityKey: v.Name,
+					identityKey: v.Name,
 				}
 			}
 			return jwt.MapClaims{}
@@ -141,11 +68,11 @@ func createAuthMiddleware() (*jwt.GinJWTMiddleware, error) {
 			id := claims["id"].(float64)
 			return &user.User{
 				Id:   uint64(id),
-				Name: claims[IdentityKey].(string),
+				Name: claims[identityKey].(string),
 			}
 		},
 		Authenticator: func(c *gin.Context) (interface{}, error) {
-			var r loginRequest
+			var r LoginRequest
 			if err := c.ShouldBindBodyWith(&r, binding.JSON); err != nil {
 				return "", fmt.Errorf(err.Error())
 			}

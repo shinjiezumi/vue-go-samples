@@ -9,10 +9,10 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 
-	"github.com/shinjiezumi/vue-go-samples/src/api/auth"
 	"github.com/shinjiezumi/vue-go-samples/src/api/database"
-	"github.com/shinjiezumi/vue-go-samples/src/api/searcher"
-	"github.com/shinjiezumi/vue-go-samples/src/api/todo"
+	"github.com/shinjiezumi/vue-go-samples/src/api/endpoint/auth"
+	"github.com/shinjiezumi/vue-go-samples/src/api/endpoint/searcher"
+	"github.com/shinjiezumi/vue-go-samples/src/api/endpoint/todo_list"
 )
 
 func main() {
@@ -42,22 +42,14 @@ func main() {
 				"message": "Vue Go Samples",
 			})
 		})
-
-		api.POST("/login", auth.Login)
-		api.GET("/refresh_token", auth.RefreshToken)
-		api.POST("/register", auth.Register)
+		auth.SetupRoute(api)
 		searcher.SetupRoute(api)
 
+		// 認証必要なエンドポイント
 		api.Use(auth.MiddlewareFunc())
 		{
-			api.GET("/user", auth.CurrentUser)
-
-			api.POST("/todos", todo.Create)
-			api.GET("/todos", todo.GetList)
-			api.PUT("/todos/:id", todo.Update)
-			api.DELETE("/todos/:id", todo.Delete)
-			api.PUT("/todos/:id/finished", todo.Finished)
-			api.PUT("/todos/:id/unfinished", todo.UnFinished)
+			auth.SetupAuthenticatedRoute(api)
+			todo_list.SetupRoute(api)
 		}
 	}
 
