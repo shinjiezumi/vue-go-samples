@@ -9,10 +9,10 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/joho/godotenv"
 
-	"github.com/shinjiezumi/vue-go-samples/src/api/auth"
 	"github.com/shinjiezumi/vue-go-samples/src/api/database"
-	"github.com/shinjiezumi/vue-go-samples/src/api/searcher"
-	"github.com/shinjiezumi/vue-go-samples/src/api/todo_list"
+	"github.com/shinjiezumi/vue-go-samples/src/api/endpoint/auth"
+	"github.com/shinjiezumi/vue-go-samples/src/api/endpoint/searcher"
+	"github.com/shinjiezumi/vue-go-samples/src/api/endpoint/todo_list"
 )
 
 func main() {

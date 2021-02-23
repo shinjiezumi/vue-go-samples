@@ -7,8 +7,8 @@ import (
 	"github.com/gin-gonic/gin"
 	"github.com/gin-gonic/gin/binding"
 
-	"github.com/shinjiezumi/vue-go-samples/src/api/auth"
 	"github.com/shinjiezumi/vue-go-samples/src/api/common"
+	"github.com/shinjiezumi/vue-go-samples/src/api/endpoint/auth"
 	"github.com/shinjiezumi/vue-go-samples/src/api/usecase/todo_list"
 )
 
