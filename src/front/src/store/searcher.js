@@ -1,5 +1,5 @@
 import axios from "axios"
-import { STATUS_OK } from "@/util";
+import {STATUS_OK} from "@/util";
 
 const state = {
   searchResult: {
@@ -24,6 +24,14 @@ const mutations = {
 };
 
 const actions = {
+  async init(context) {
+    context.commit('setResult', {
+      Qiita: [],
+      SlideShare: [],
+      Feedly: [],
+    });
+    context.commit('error/clearError', {}, {root: true});
+  },
   async search(context, data) {
     context.commit('error/clearError', {}, {root: true});
     context.commit('loading/setStatus', true, {root: true});
