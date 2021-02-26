@@ -72,7 +72,7 @@ a {
 </style>
 
 <script>
-import { generateTitle, STATUS_UNAUTHORIZED } from "@/util";
+import {generateTitle} from "@/util";
 import QiitaList from "../components/searcher/QiitaList"
 import SlideList from "../components/searcher/SlideList"
 import FeedList from "../components/searcher/FeedList"
@@ -88,6 +88,7 @@ export default {
     }
   },
   created() {
+    this.init()
   },
   computed: {
     searchResult() {
@@ -104,6 +105,9 @@ export default {
     }
   },
   methods: {
+    init() {
+      this.$store.dispatch('searcher/init')
+    },
     search() {
       if (this.keyword === "" || this.isLoadingOn)
         return
@@ -111,18 +115,7 @@ export default {
       const params = {
         q: this.keyword
       };
-
-      (async () => {
-        await this.$store.dispatch('searcher/search', params);
-        if (this.error !== '') {
-          return this.handleError();
-        }
-      })()
-    },
-    handleError() {
-      if (this.errorCode === STATUS_UNAUTHORIZED) {
-        this.$store.dispatch('auth/logout');
-      }
+      this.$store.dispatch('searcher/search', params)
     }
   },
 }
