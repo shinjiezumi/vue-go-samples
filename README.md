@@ -3,7 +3,7 @@ Vue/Vuex + Go/Gin + MySQLを使ったサンプルアプリ
 
 - Todolist
 
-- goroutine/channelを使った検索アプリ(comming soon...)
+- Searcher
 
 ## Todolist
 
