@@ -1,15 +1,15 @@
 <template>
-  <v-content>
+  <v-main>
     <v-container>
       <v-row class="text-center" align="center" justify="center">404</v-row>
     </v-container>
-  </v-content>
+  </v-main>
 </template>
 
 <script>
-  import { generateTitle } from "../util";
+import {generateTitle} from "../util";
 
-  export default {
-    title: generateTitle('Not Found'),
-  }
+export default {
+  title: generateTitle('Not Found'),
+}
 </script>

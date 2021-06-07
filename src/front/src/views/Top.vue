@@ -1,5 +1,5 @@
 <template>
-  <v-content>
+  <v-main>
     <v-row class="text-center mt-5 pa-3" align="center" justify="center">
       <v-col class="mb-4" cols="12" sm="4">
         <IntroduceAppCard
@@ -18,11 +18,11 @@
         />
       </v-col>
     </v-row>
-  </v-content>
+  </v-main>
 </template>
 
 <script>
-import { generateTitle } from "@/util";
+import {generateTitle} from "@/util";
 import IntroduceAppCard from "../components/IntroduceAppCard.vue"
 
 export default {

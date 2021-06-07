@@ -1,9 +1,9 @@
 <template>
-  <v-content>
+  <v-main>
     <v-container>
       <v-row class="text-center" align="center" justify="center">
         <v-col cols="8">
-          <v-alert v-if="this.getError !== ''" type="error" text>{{this.getError}}</v-alert>
+          <v-alert v-if="this.getError !== ''" type="error" text>{{ this.getError }}</v-alert>
         </v-col>
       </v-row>
       <v-row class="text-center" align="center" justify="center">
@@ -42,33 +42,35 @@
                 <v-btn color="primary" @click="testLogin">テストユーザーでログイン</v-btn>
               </v-col>
               <v-col>
-                会員登録は<router-link to="/register">こちら</router-link>から
+                会員登録は
+                <router-link to="/register">こちら</router-link>
+                から
               </v-col>
             </v-form>
           </v-card>
         </v-col>
       </v-row>
     </v-container>
-  </v-content>
+  </v-main>
 </template>
 
 <script>
-  import { mapGetters } from 'vuex'
-  import { validationMixin } from 'vuelidate'
-  import { email, minLength, required } from 'vuelidate/lib/validators'
-  import { generateTitle } from "@/util";
+import {mapGetters} from 'vuex'
+import {validationMixin} from 'vuelidate'
+import {email, minLength, required} from 'vuelidate/lib/validators'
+import {generateTitle} from "@/util";
 
-  export default {
-    name: "Login",
-    title: generateTitle('ログイン'),
-    mixins: [validationMixin],
-    created() {
-      this.$store.commit("error/clearError")
-    },
-    validations: {
-      email: {required, email},
-      password: {required, minLength: minLength(8)},
-    },
+export default {
+  name: "Login",
+  title: generateTitle('ログイン'),
+  mixins: [validationMixin],
+  created() {
+    this.$store.commit("error/clearError")
+  },
+  validations: {
+    email: {required, email},
+    password: {required, minLength: minLength(8)},
+  },
     data() {
       return {
         email: '',

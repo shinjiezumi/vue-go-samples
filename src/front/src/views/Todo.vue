@@ -1,5 +1,5 @@
 <template>
-  <v-content>
+  <v-main>
     <v-row class="text-center" align="center" justify="center">
       <v-col class="mb-4" cols="12" sm="8">
         <h1>TodoList</h1>
@@ -68,11 +68,11 @@
         </v-col>
       </v-row>
     </div>
-  </v-content>
+  </v-main>
 </template>
 
 <script>
-import { formatDate, generateTitle, parseDate, STATUS_UNAUTHORIZED } from "@/util";
+import {formatDate, generateTitle, parseDate, STATUS_UNAUTHORIZED} from "@/util";
 import TodoForm from "../components/todo/TodoForm";
 
 export default {

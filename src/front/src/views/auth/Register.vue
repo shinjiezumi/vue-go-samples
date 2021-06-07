@@ -1,9 +1,9 @@
 <template>
-  <v-content>
+  <v-main>
     <v-container>
       <v-row class="text-center" align="center" justify="center">
         <v-col cols="8">
-          <v-alert v-if="this.getError !== ''" type="error" text>{{this.getError}}</v-alert>
+          <v-alert v-if="this.getError !== ''" type="error" text>{{ this.getError }}</v-alert>
         </v-col>
       </v-row>
       <v-row class="text-center" align="center" justify="center">
@@ -50,33 +50,35 @@
                 <v-btn color="primary" @click="register">会員登録</v-btn>
               </v-col>
               <v-col>
-                アカウントをお持ちの方は<router-link to="/login">こちら</router-link>から
+                アカウントをお持ちの方は
+                <router-link to="/login">こちら</router-link>
+                から
               </v-col>
             </v-form>
           </v-card>
         </v-col>
       </v-row>
     </v-container>
-  </v-content>
+  </v-main>
 </template>
 
 <script>
-  import { validationMixin } from 'vuelidate'
-  import { email, maxLength, minLength, required } from 'vuelidate/lib/validators'
-  import { mapGetters } from "vuex";
-  import { generateTitle } from "@/util";
+import {validationMixin} from 'vuelidate'
+import {email, maxLength, minLength, required} from 'vuelidate/lib/validators'
+import {mapGetters} from "vuex";
+import {generateTitle} from "@/util";
 
-  export default {
-    name: "Login",
-    title: generateTitle('会員登録'),
-    mixins: [validationMixin],
-    created() {
-      this.$store.commit("error/clearError")
-    },
-    validations: {
-      name: {required, maxLength: maxLength(255)},
-      email: {required, email, maxLength: maxLength(255)},
-      password: {required, minLength: minLength(8), maxLength: maxLength(16)},
+export default {
+  name: "Login",
+  title: generateTitle('会員登録'),
+  mixins: [validationMixin],
+  created() {
+    this.$store.commit("error/clearError")
+  },
+  validations: {
+    name: {required, maxLength: maxLength(255)},
+    email: {required, email, maxLength: maxLength(255)},
+    password: {required, minLength: minLength(8), maxLength: maxLength(16)},
     },
     data() {
       return {

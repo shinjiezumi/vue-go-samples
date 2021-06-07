@@ -1,21 +1,21 @@
 <template>
-  <v-content>
+  <v-main>
     <HelloWorld/>
-  </v-content>
+  </v-main>
 </template>
 
 <script>
-  import HelloWorld from '../components/HelloWorld';
+import HelloWorld from '../components/HelloWorld';
 
-  export default {
-    name: 'Hello',
+export default {
+  name: 'Hello',
 
-    components: {
-      HelloWorld,
-    },
+  components: {
+    HelloWorld,
+  },
 
-    data: () => ({
-      //
-    }),
-  };
+  data: () => ({
+    //
+  }),
+};
 </script>
