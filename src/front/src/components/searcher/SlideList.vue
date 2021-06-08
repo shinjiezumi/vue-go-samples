@@ -6,11 +6,11 @@
       <v-list-item>
         <!-- サイト画像 -->
         <v-list-item-avatar size="100">
-          <v-img :src="item.ImageURL"></v-img>
+          <v-img :src="item.ImageURL" />
         </v-list-item-avatar>
         <v-list-item-content>
           <!-- タイトル -->
-          <v-list-item-title class="Item__Title" v-text="item.Title"></v-list-item-title>
+          <v-list-item-title class="Item__Title" v-text="item.Title" />
           <!-- ディスクリプション -->
           <v-list-item-content>{{ item.Description }}</v-list-item-content>
           <div class="Item__Link">
@@ -20,21 +20,21 @@
           </div>
         </v-list-item-content>
       </v-list-item>
-      <v-divider></v-divider>
+      <v-divider />
     </div>
   </v-list>
 </template>
 
 <script>
 export default {
-  name: "SlideList",
+  name: 'SlideList',
   props: {
     items: {
       type: Array,
       default: () => ([]),
     },
   },
-}
+};
 </script>
 
 <style scoped>

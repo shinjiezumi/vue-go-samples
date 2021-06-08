@@ -8,7 +8,7 @@
           <!-- ユーザー情報＋投稿日時 -->
           <div class="Item__UserInfo">
             <v-list-item-avatar class="item__UserAvatar" size="30">
-              <v-img :src="item.ProfileImageURL"></v-img>
+              <v-img :src="item.ProfileImageURL" />
             </v-list-item-avatar>
             <div class="Item__CreatedMessage">
               <a href="'https://qiita.com/' + item.UserID" target="_blank">{{ item.UserID }}</a>
@@ -16,17 +16,21 @@
             </div>
           </div>
           <!-- タイトル -->
-          <v-list-item-title class="Item__Title" v-text="item.Title"></v-list-item-title>
+          <v-list-item-title class="Item__Title" v-text="item.Title" />
           <!-- タグ -->
           <div class="Item__Tags">
-            <v-icon color="teal">mdi-tag</v-icon>
+            <v-icon color="teal">
+              mdi-tag
+            </v-icon>
             <span v-for="(tag, i) in item.Tags" :key="tag" class="Item__Tag">
               {{ tag }}<template v-if="i !== (item.Tags.length - 1)">,</template>
             </span>
           </div>
           <!-- LGTM数 -->
           <div class="Item__Reaction">
-            <v-icon color="teal">mdi-thumb-up</v-icon>
+            <v-icon color="teal">
+              mdi-thumb-up
+            </v-icon>
             <span class="Item__LikeCount">{{ item.LikeCount }}</span>
           </div>
           <!-- 記事リンク -->
@@ -37,21 +41,21 @@
           </div>
         </v-list-item-content>
       </v-list-item>
-      <v-divider></v-divider>
+      <v-divider />
     </div>
   </v-list>
 </template>
 
 <script>
 export default {
-  name: "QiitaList",
+  name: 'QiitaList',
   props: {
     items: {
       type: Array,
       default: () => ([]),
     },
   },
-}
+};
 </script>
 
 <style scoped>
