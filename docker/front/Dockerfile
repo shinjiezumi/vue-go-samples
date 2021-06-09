@@ -1,7 +1,8 @@
-FROM node:12.12.0-alpine
+FROM node:14.17.0-alpine
 
 WORKDIR /app
 
 RUN apk update && \
+    apk add python make g++ && \
     npm install -g npm && \
-    npm install -g npm @vue/cli
+    npm install -g vue-cli

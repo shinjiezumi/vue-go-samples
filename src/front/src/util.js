@@ -1,14 +1,12 @@
-import { APP_NAME } from "./constants";
+import { APP_NAME } from './constants';
 
 export const STATUS_OK = 200;
 export const STATUS_UNAUTHORIZED = 401;
 
-export const getToken = () => {
-  return localStorage.getItem("token")
-};
+export const getToken = () => localStorage.getItem('token');
 
 export const setToken = (token) => {
-  localStorage.setItem("token", token)
+  localStorage.setItem('token', token);
 };
 
 export const formatDate = (date) => {
@@ -23,6 +21,4 @@ export const parseDate = (date) => {
   return date.replace(/\//g, '-');
 };
 
-export const generateTitle = (pageTitle) => {
-  return `${pageTitle}｜${APP_NAME}`
-};
+export const generateTitle = (pageTitle) => `${pageTitle}｜${APP_NAME}`;

@@ -6,14 +6,16 @@
       <v-list-item>
         <!-- サイト画像 -->
         <v-list-item-avatar size="100">
-          <v-img :src="item.ImageURL"></v-img>
+          <v-img :src="item.ImageURL" />
         </v-list-item-avatar>
         <v-list-item-content>
           <!-- タイトル -->
-          <v-list-item-title class="Item__Title" v-text="item.Title"></v-list-item-title>
+          <v-list-item-title class="Item__Title" v-text="item.Title" />
           <!-- タグ -->
           <div class="Item__Tags">
-            <v-icon color="teal">mdi-tag</v-icon>
+            <v-icon color="teal">
+              mdi-tag
+            </v-icon>
             <span v-for="(tag, i) in item.Tags" :key="tag" class="Item__Tag">
               {{ tag }}
               <span v-if="i !== (item.Tags.length - 1)">,</span>
@@ -28,21 +30,21 @@
           </div>
         </v-list-item-content>
       </v-list-item>
-      <v-divider></v-divider>
+      <v-divider />
     </div>
   </v-list>
 </template>
 
 <script>
 export default {
-  name: "FeedList",
+  name: 'FeedList',
   props: {
     items: {
       type: Array,
       default: () => ([]),
     },
   },
-}
+};
 </script>
 
 <style scoped>

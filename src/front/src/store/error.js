@@ -1,11 +1,13 @@
 const state = {
-  code: "",
-  message: ""
+  code: '',
+  message: '',
 };
 
 const getters = {
-  getCode: state => state.code,
-  getError: state => state.message
+  // eslint-disable-next-line no-shadow
+  getCode: (state) => state.code,
+  // eslint-disable-next-line no-shadow
+  getError: (state) => state.message,
 };
 
 const mutations = {
@@ -14,9 +16,9 @@ const mutations = {
     state.message = data.message;
   },
   clearError() {
-    state.code = "";
-    state.message = "";
-  }
+    state.code = '';
+    state.message = '';
+  },
 };
 
 export default {
@@ -24,5 +26,4 @@ export default {
   state,
   getters,
   mutations,
-}
-
+};

@@ -1,37 +1,38 @@
 <template>
-  <v-content>
+  <v-main>
     <v-row class="text-center mt-5 pa-3" align="center" justify="center">
       <v-col class="mb-4" cols="12" sm="4">
         <IntroduceAppCard
-            app-title="TodoList"
-            app-sub-title="シンプルなTodoアプリ"
-            app-path="/todos"
-            app-image="/img/TodoList.png"
+          app-title="TodoList"
+          app-sub-title="シンプルなTodoアプリ"
+          app-path="/todos"
+          app-image="/img/TodoList.png"
         />
       </v-col>
       <v-col class="mb-4" cols="12" sm="4">
         <IntroduceAppCard
-            app-title="Searcher"
-            app-sub-title="複数サイトのコンテンツを検索するアプリ"
-            app-path="/searcher"
-            app-image="/img/Searcher.png"
+          app-title="Searcher"
+          app-sub-title="複数サイトのコンテンツを検索するアプリ"
+          app-path="/searcher"
+          app-image="/img/Searcher.png"
         />
       </v-col>
     </v-row>
-  </v-content>
+  </v-main>
 </template>
 
 <script>
-import { generateTitle } from "@/util";
-import IntroduceAppCard from "../components/IntroduceAppCard.vue"
+// eslint-disable-next-line import/no-unresolved
+import { generateTitle } from '@/util';
+import IntroduceAppCard from '../components/IntroduceAppCard.vue';
 
 export default {
-  name: "Top",
+  name: 'Top',
   title: generateTitle('トップページ'),
   components: {
-    IntroduceAppCard
-  }
-}
+    IntroduceAppCard,
+  },
+};
 </script>
 
 <style scoped>

@@ -7,12 +7,15 @@
 </template>
 
 <script>
-  import Header from "./components/Header";
-  import Footer from "./components/Footer";
-  export default {
-    components: {
-      Header: Header,
-      Footer: Footer
-    }
-  }
+// eslint-disable-next-line import/extensions,import/no-unresolved
+import Header from './components/Header';
+// eslint-disable-next-line import/extensions,import/no-unresolved
+import Footer from './components/Footer';
+
+export default {
+  components: {
+    Header,
+    Footer,
+  },
+};
 </script>

@@ -1,21 +1,22 @@
 <template>
-  <v-content>
-    <HelloWorld/>
-  </v-content>
+  <v-main>
+    <HelloWorld />
+  </v-main>
 </template>
 
 <script>
-  import HelloWorld from '../components/HelloWorld';
+// eslint-disable-next-line import/extensions,import/no-unresolved
+import HelloWorld from '../components/HelloWorld';
 
-  export default {
-    name: 'Hello',
+export default {
+  name: 'Hello',
 
-    components: {
-      HelloWorld,
-    },
+  components: {
+    HelloWorld,
+  },
 
-    data: () => ({
-      //
-    }),
-  };
+  data: () => ({
+    //
+  }),
+};
 </script>

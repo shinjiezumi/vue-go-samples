@@ -68,16 +68,16 @@ workflows:
   build_and_deploy_to_managed_workflow:
     jobs:
       - api-test
-      - api-build_push_image_cloud_run_mangaged:
-          requires:
-            - api-test
-          filters:
-            branches:
-              only: master
-#      - front-test
-      - front-build_push_image_cloud_run_mangaged:
+#      - api-build_push_image_cloud_run_mangaged:
 #          requires:
-#            - front-test
-          filters:
-            branches:
-              only: master
+#            - api-test
+#          filters:
+#            branches:
+#              only: master
+##      - front-test
+#      - front-build_push_image_cloud_run_mangaged:
+##          requires:
+##            - front-test
+#          filters:
+#            branches:
+#              only: master

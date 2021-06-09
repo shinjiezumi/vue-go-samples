@@ -1,18 +1,25 @@
-import Vue from 'vue'
-import Router from "vue-router"
-import Hello from "./views/Hello";
-import NotFound from "./views/404"
-import Login from "./views/auth/Login";
-import Register from "./views/auth/Register";
-import Top from "./views/Top";
-import Todo from "./views/Todo"
-import Searcher from "./views/Searcher.vue"
-import store from "./store"
+import Vue from 'vue';
+import Router from 'vue-router';
+// eslint-disable-next-line import/no-unresolved,import/extensions
+import Hello from './views/Hello';
+// eslint-disable-next-line import/no-unresolved,import/extensions
+import NotFound from './views/404';
+// eslint-disable-next-line import/no-unresolved,import/extensions
+import Login from './views/auth/Login';
+// eslint-disable-next-line import/no-unresolved,import/extensions
+import Register from './views/auth/Register';
+// eslint-disable-next-line import/no-unresolved,import/extensions
+import Top from './views/Top';
+// eslint-disable-next-line import/no-unresolved,import/extensions
+import Todo from './views/Todo';
+import Searcher from './views/Searcher.vue';
+// eslint-disable-next-line import/no-cycle
+import store from './store';
 
 Vue.use(Router);
 
 export default new Router({
-  mode: "history",
+  mode: 'history',
   routes: [
     {
       path: '/',
@@ -23,33 +30,33 @@ export default new Router({
       component: Register,
       beforeEnter(to, from, next) {
         if (store.getters['auth/check']) {
-          next('/todos')
+          next('/todos');
         } else {
-          next()
+          next();
         }
-      }
+      },
     },
     {
       path: '/login',
       component: Login,
       beforeEnter(to, from, next) {
         if (store.getters['auth/check']) {
-          next('/todos')
+          next('/todos');
         } else {
-          next()
+          next();
         }
-      }
+      },
     },
     {
       path: '/todos',
       component: Todo,
       beforeEnter(to, from, next) {
         if (!store.getters['auth/check']) {
-          next('/login')
+          next('/login');
         } else {
-          next()
+          next();
         }
-      }
+      },
     },
     {
       path: '/searcher',
@@ -57,12 +64,11 @@ export default new Router({
     },
     {
       path: '/hello',
-      component: Hello
+      component: Hello,
     },
     {
       path: '*',
-      component: NotFound
-    }
-  ]
-})
-
+      component: NotFound,
+    },
+  ],
+});
